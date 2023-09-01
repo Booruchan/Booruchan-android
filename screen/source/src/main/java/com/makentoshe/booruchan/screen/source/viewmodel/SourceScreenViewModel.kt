@@ -20,6 +20,8 @@ import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
+import com.makentoshe.booruchan.screen.source.entity.TagType
+import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -39,6 +41,7 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.NavigationBack -> navigationBack()
         is SourceScreenEvent.NavigationBackdrop -> navigationBackdrop()
         is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
+        is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) {
@@ -87,6 +90,12 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
         updateState { copy(searchState = searchState.copy(value = event.value)) }
+    }
+
+    private fun searchAddTag(event: SourceScreenEvent.SearchTagAdd) {
+        internalLogInfo("invoke search add tag: ${event.tag}")
+        val tag = TagUiState(string = event.tag, type = TagType.General)
+        updateState { copy(searchState = searchState.copy(tags = searchState.tags.plus(tag))) }
     }
 
     private fun pluginSourceNullContentState(): ContentState.Failure {

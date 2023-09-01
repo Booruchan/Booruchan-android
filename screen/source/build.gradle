@@ -61,6 +61,8 @@ dependencies {
     implementation "androidx.compose.material3:material3:$compose_material3_version"
     implementation "androidx.compose.material:material:$compose_material_version"
     implementation "androidx.compose.runtime:runtime:$compose_runtime_version"
+    implementation "androidx.compose.foundation:foundation:$compose_flow_version"
+
 
     implementation("io.coil-kt:coil-compose:$compose_coil_version")
 
