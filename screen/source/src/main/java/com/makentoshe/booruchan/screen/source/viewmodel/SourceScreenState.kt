@@ -6,6 +6,7 @@ import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.paging.PagingData
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
+import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import kotlinx.coroutines.flow.Flow
 import javax.annotation.concurrent.Immutable
 
@@ -20,7 +21,11 @@ data class SourceScreenState(
             sourceTitle = "",
             backdropValue = BackdropValue.Revealed,
             contentState = ContentState.Loading,
-            searchState = SearchState(value = "", label = "Ex: blue_sky cloud 1girl"),
+            searchState = SearchState(
+                value = "",
+                label = "Ex: blue_sky cloud 1girl",
+                tags = emptySet(),
+            ),
         )
     }
 }
@@ -43,4 +48,5 @@ sealed interface ContentState {
 data class SearchState(
     val value: String,
     val label: String,
+    val tags: Set<TagUiState>,
 )
