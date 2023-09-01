@@ -13,12 +13,14 @@ data class SourceScreenState(
     val sourceTitle: String,
     val backdropValue: BackdropValue,
     val contentState: ContentState,
+    val searchState: SearchState,
 ) {
     companion object {
         val InitialState = SourceScreenState(
             sourceTitle = "",
             backdropValue = BackdropValue.Revealed,
             contentState = ContentState.Loading,
+            searchState = SearchState(value = "", label = "Ex: blue_sky cloud 1girl"),
         )
     }
 }
@@ -36,3 +38,9 @@ sealed interface ContentState {
         val description: String,
     ) : ContentState
 }
+
+@Immutable
+data class SearchState(
+    val value: String,
+    val label: String,
+)

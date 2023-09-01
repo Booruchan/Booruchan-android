@@ -38,6 +38,7 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.Initialize -> initialize(event)
         is SourceScreenEvent.NavigationBack -> navigationBack()
         is SourceScreenEvent.NavigationBackdrop -> navigationBackdrop()
+        is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) {
@@ -82,6 +83,10 @@ class SourceScreenViewModel @Inject constructor(
             BackdropValue.Revealed -> BackdropValue.Concealed
         }
         updateState { copy(backdropValue = newState) }
+    }
+
+    private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
+        updateState { copy(searchState = searchState.copy(value = event.value)) }
     }
 
     private fun pluginSourceNullContentState(): ContentState.Failure {

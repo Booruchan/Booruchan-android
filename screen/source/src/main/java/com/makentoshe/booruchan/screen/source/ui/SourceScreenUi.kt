@@ -40,7 +40,7 @@ fun SourceScreenUi(
             SourceScreenTopbar(screenState = screenState, screenEvent = screenEvent)
         },
         frontLayerContent = {
-            PrimaryText(text = "SASDASDAFSDFSDFSF")
+            SourceScreenSearch(screenState = screenState, screenEvent = screenEvent)
         },
         backLayerContent = {
             SourceScreenContent(screenState = screenState, screenEvent = screenEvent)
