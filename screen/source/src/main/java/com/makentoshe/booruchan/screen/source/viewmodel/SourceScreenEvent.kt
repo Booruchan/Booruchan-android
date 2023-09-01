@@ -8,4 +8,6 @@ sealed interface SourceScreenEvent {
 
     object NavigationBackdrop : SourceScreenEvent
 
+    data class SearchValueChange(val value: String): SourceScreenEvent
+
 }
