@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,14 +15,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.makentoshe.booruchan.library.resources.R
 import com.makentoshe.booruchan.screen.source.ui.component.ChipGroup
 import com.makentoshe.booruchan.screen.source.ui.component.ChipItem
 import com.makentoshe.booruchan.screen.source.ui.component.SearchTextField
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.PrimaryText
+import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
+import com.makentoshe.library.uikit.theme.tag
 
 @Composable
 internal fun SourceScreenSearch(
@@ -37,15 +40,7 @@ internal fun SourceScreenSearch(
 
     Spacer(modifier = Modifier.size(16.dp))
 
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        ChipGroup(modifier = Modifier.fillMaxWidth()) {
-            screenState.searchState.tags.forEach { tagUiState ->
-                ChipItem(state = tagUiState, screenEvent = screenEvent)
-            }
-        }
-
-        PrimaryText(text = "SASDASDAFSDFSDFSF")
-    }
+    SourceScreenSearchContent(screenState = screenState, screenEvent = screenEvent)
 }
 
 @Composable
@@ -76,4 +71,35 @@ private fun SourceScreenSearchHeader(
     )
 }
 
+@Composable
+private fun SourceScreenSearchContent(
+    screenState: SourceScreenState,
+    screenEvent: (SourceScreenEvent) -> Unit,
+) = Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    SourceScreenSearchContentGeneral(screenState = screenState, screenEvent = screenEvent)
+}
 
+@Composable
+private fun SourceScreenSearchContentGeneral(
+    screenState: SourceScreenState,
+    screenEvent: (SourceScreenEvent) -> Unit,
+) {
+    val generalTags by remember(key1 = screenState.searchState) {
+        mutableStateOf(screenState.searchState.generalTags)
+    }
+
+    if (generalTags.isNotEmpty()) {
+        SecondaryText(
+            text = stringResource(id = R.string.source_search_tags_general),
+            color = BooruchanTheme.colors.tag.general,
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        ChipGroup(modifier = Modifier.fillMaxWidth()) {
+            generalTags.forEach { tagUiState ->
+                ChipItem(state = tagUiState, screenEvent = screenEvent)
+            }
+        }
+    }
+}

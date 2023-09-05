@@ -5,14 +5,11 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 val LightMaterialColorScheme = lightColorScheme(
-    primary = Black,
-    onPrimary = White,
+    primary = Black, onPrimary = White,
 
-    secondary = White,
-    onSecondary = Black,
+    secondary = White, onSecondary = Black,
 
-    background = White,
-    onBackground = Black
+    background = White, onBackground = Black
 )
 
 val LightColorScheme = BooruchanColorScheme(
@@ -41,14 +38,11 @@ val DarkColorScheme = BooruchanColorScheme(
 )
 
 val DarkMaterialColorScheme = darkColorScheme(
-    primary = Black,
-    onPrimary = White,
+    primary = Black, onPrimary = White,
 
-    secondary = White,
-    onSecondary = Black,
+    secondary = White, onSecondary = Black,
 
-    background = White,
-    onBackground = Black
+    background = White, onBackground = Black
 )
 
 
@@ -69,3 +63,21 @@ val BooruchanColorScheme.transparent: Color
 
 val BooruchanColorScheme.error: Color
     get() = Color.Red
+
+
+val BooruchanColorScheme.tag: BooruchanTagScheme
+    get() = BooruchanTagScheme(
+        general = Color.Black,
+        artist = Red500,
+        character = Green500,
+        copyright = Purple500,
+        metadata = Amber500,
+    )
+
+data class BooruchanTagScheme(
+    val general: Color,
+    val artist: Color,
+    val character: Color,
+    val copyright: Color,
+    val metadata: Color,
+)
