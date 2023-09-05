@@ -19,6 +19,7 @@ import com.makentoshe.booruchan.library.feature.EventDelegate
 import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
+import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
@@ -42,6 +43,7 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.NavigationBackdrop -> navigationBackdrop()
         is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
+        is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) {
@@ -94,8 +96,21 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun searchAddTag(event: SourceScreenEvent.SearchTagAdd) {
         internalLogInfo("invoke search add tag: ${event.tag}")
-        val tag = TagUiState(string = event.tag, type = TagType.General)
-        updateState { copy(searchState = searchState.copy(tags = searchState.tags.plus(tag))) }
+        // skip any blank input: we're not interested in it
+        if (event.tag.isBlank()) return internalLogInfo("skip add tag: ${event.tag}")
+        // General is a default type for tag
+        val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
+        // Append new tag to current tags
+        updateState { copy(searchState = searchState.copy(tags = searchState.tags.plus(tagUiState))) }
+    }
+
+    private fun searchRemoveTag(event: SourceScreenEvent.SearchTagRemove) {
+        internalLogInfo("invoke remove tag: ${event.tag}")
+
+        val tagUiState = state.searchState.tags.find{ it.tag == event.tag }
+            ?: return internalLogWarn("could not find tag: ${event.tag}")
+
+        updateState { copy(searchState = searchState.copy(tags = searchState.tags.minus(tagUiState))) }
     }
 
     private fun pluginSourceNullContentState(): ContentState.Failure {
