@@ -8,4 +8,7 @@
     <string name="home_source_error">%s - not available</string>
     <string name="home_source_ok">%s</string>
 
+
+    <string name="source_search_tags_general">General</string>
+
 </resources>

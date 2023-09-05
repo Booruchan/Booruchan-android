@@ -6,6 +6,7 @@ import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.paging.PagingData
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
+import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import kotlinx.coroutines.flow.Flow
 import javax.annotation.concurrent.Immutable
@@ -49,4 +50,7 @@ data class SearchState(
     val value: String,
     val label: String,
     val tags: Set<TagUiState>,
-)
+) {
+    val generalTags: List<TagUiState>
+        get() = tags.filter { it.type == TagType.General }
+}
