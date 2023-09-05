@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.screen.source.ui.component.ChipGroup
+import com.makentoshe.booruchan.screen.source.ui.component.ChipItem
 import com.makentoshe.booruchan.screen.source.ui.component.SearchTextField
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
@@ -36,13 +37,15 @@ internal fun SourceScreenSearch(
 
     Spacer(modifier = Modifier.size(16.dp))
 
-    ChipGroup(modifier = Modifier.fillMaxWidth()) {
-        screenState.searchState.tags.forEach { it ->
-            Text(text = it.string)
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        ChipGroup(modifier = Modifier.fillMaxWidth()) {
+            screenState.searchState.tags.forEach { tagUiState ->
+                ChipItem(state = tagUiState, screenEvent = screenEvent)
+            }
         }
-    }
 
-    PrimaryText(text = "SASDASDAFSDFSDFSF")
+        PrimaryText(text = "SASDASDAFSDFSDFSF")
+    }
 }
 
 @Composable
