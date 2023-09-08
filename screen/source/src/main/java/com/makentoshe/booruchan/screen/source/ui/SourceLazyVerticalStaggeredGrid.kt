@@ -31,6 +31,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import coil.size.Scale
 import coil.size.Size
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
 import com.makentoshe.booruchan.screen.source.viewmodel.ContentState
@@ -87,7 +88,7 @@ private fun SourcePreviewPostUi(
     SubcomposeAsyncImage(
         modifier = Modifier.fillMaxSize(),
         model = request,
-        contentScale = ContentScale.FillBounds,
+        contentScale = ContentScale.Crop,
         contentDescription = null,
         loading = {
             IndeterminateProgressBar(modifier = Modifier.wrapContentSize())
