@@ -12,6 +12,7 @@ class PostPagingSource @Inject constructor(
     private val fetchPosts: FetchPostsUseCase,
     private val fetchPostsFactory: FetchPostsFactory,
     private val mapper: Post2PreviewPostUiStateMapper,
+    private val query: String,
 ) : PagingSource<Int, PreviewPostUiState>() {
 
     override fun getRefreshKey(state: PagingState<Int, PreviewPostUiState>): Int? {
@@ -34,12 +35,9 @@ class PostPagingSource @Inject constructor(
     private suspend fun internalLoad(params: LoadParams<Int>): LoadResult<Int, PreviewPostUiState> {
         // Start refresh at page 1 if undefined.
         val nextPageNumber = params.key ?: fetchPostsFactory.initialPageNumber
-        val postsPerPage = params.loadSize // booruContext.settings.searchSettings.requestedPostsPerPageCount
-//        val tagSeparator = fetchPostsFactory.searchTagSeparator
-//        val tags = booruSearch.tags.joinToString(separator = tagSeparator) { it.string }
-        val tags = "hatsune_miku"
+        val postsPerPage = params.loadSize
 
-        val fetchPostsRequest = FetchPostsFactory.FetchPostsRequest(postsPerPage, nextPageNumber, tags)
+        val fetchPostsRequest = FetchPostsFactory.FetchPostsRequest(postsPerPage, nextPageNumber, query)
         val response = fetchPosts(fetchPostsFactory, fetchPostsRequest)
 
         return LoadResult.Page(

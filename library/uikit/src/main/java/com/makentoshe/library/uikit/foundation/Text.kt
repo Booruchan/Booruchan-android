@@ -72,6 +72,22 @@ fun SecondaryText(
 )
 
 @Composable
+fun SecondaryTextBold(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = BooruchanTheme.colors.opaque,
+    textAlign: TextAlign = TextAlign.Start,
+    maxLines: Int = Int.MAX_VALUE,
+) = Text(
+    text = text,
+    modifier = modifier,
+    style = BooruchanTheme.typography.secondaryTextBold,
+    color = color,
+    textAlign = textAlign,
+    maxLines = maxLines,
+)
+
+@Composable
 fun SmallText(
     text: String,
     modifier: Modifier = Modifier,

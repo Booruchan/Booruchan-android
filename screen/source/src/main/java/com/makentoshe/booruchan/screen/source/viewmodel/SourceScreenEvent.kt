@@ -13,4 +13,6 @@ sealed interface SourceScreenEvent {
     data class SearchTagAdd(val tag: String): SourceScreenEvent
 
     data class SearchTagRemove(val tag: String): SourceScreenEvent
+
+    object SearchApplyFilters: SourceScreenEvent
 }

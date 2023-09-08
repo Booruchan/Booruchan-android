@@ -9,8 +9,8 @@ class PagingSourceFactory @Inject constructor(
     private val fetchPosts: FetchPostsUseCase,
     private val mapper: Post2PreviewPostUiStateMapper,
 ) {
-    fun buildPost(factory: FetchPostsFactory): PostPagingSource {
-        return PostPagingSource(fetchPosts = fetchPosts, fetchPostsFactory = factory, mapper = mapper)
+    fun buildPost(factory: FetchPostsFactory, query: String): PostPagingSource {
+        return PostPagingSource(fetchPosts = fetchPosts, fetchPostsFactory = factory, mapper = mapper, query = query)
     }
 
     fun buildError(throwable: Throwable): ErrorPagingSource {
