@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.screen.source.ui
+package com.makentoshe.booruchan.screen.source.ui.search
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,33 +55,6 @@ internal fun SourceScreenSearch(
     SourceScreenSearchFooter(screenState = screenState, screenEvent = screenEvent)
 }
 
-@Composable
-private fun SourceScreenSearchHeader(
-    screenState: SourceScreenState,
-    screenEvent: (SourceScreenEvent) -> Unit,
-) = Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-    var searchTextFieldFocus by remember { mutableStateOf(false) }
-    val searchTextFieldLabelString by remember(key1 = screenState.searchState.value, key2 = searchTextFieldFocus) {
-        if (screenState.searchState.value.isEmpty() && !searchTextFieldFocus) {
-            mutableStateOf(screenState.searchState.label)
-        } else {
-            mutableStateOf(null)
-        }
-    }
-
-    SearchTextField(
-        modifier = Modifier.fillMaxWidth().onFocusChanged { searchTextFieldFocus = it.hasFocus },
-        value = screenState.searchState.value,
-        onValueChange = {
-            screenEvent(SourceScreenEvent.SearchValueChange(value = it))
-        },
-        label = searchTextFieldLabelString?.let { { PrimaryText(text = it) } },
-        keyboardActions = KeyboardActions(onSearch = {
-            screenEvent(SourceScreenEvent.SearchTagAdd(tag = screenState.searchState.value))
-            screenEvent(SourceScreenEvent.SearchValueChange(value = ""))
-        })
-    )
-}
 
 @Composable
 private fun SourceScreenSearchContent(
@@ -116,18 +89,5 @@ private fun SourceScreenSearchContentGeneral(
                 ChipItem(state = tagUiState, screenEvent = screenEvent)
             }
         }
-    }
-}
-
-@Composable
-private fun SourceScreenSearchFooter(
-    screenState: SourceScreenState,
-    screenEvent: (SourceScreenEvent) -> Unit,
-) = Column(modifier = Modifier.padding(16.dp)) {
-    Button(
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-        onClick = { screenEvent(SourceScreenEvent.SearchApplyFilters) },
-    ) {
-        SecondaryTextBold(color = BooruchanTheme.colors.background, text = "Apply filters")
     }
 }

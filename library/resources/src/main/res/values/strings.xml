@@ -11,4 +11,6 @@
 
     <string name="source_search_tags_general">General</string>
 
+    <string name="source_search_apply_filters_button">Apply filters</string>
+
 </resources>

@@ -21,7 +21,6 @@ import com.makentoshe.screen.boorulist.mapper.Source2SourceUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +43,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun onHealthCheckSource(source: Source) {
-        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+        viewModelScope.iolaunch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
             onHealthCheckFailure(source, throwable)
         }) {
             val factory = source.healthCheckFactory
@@ -93,7 +92,7 @@ class HomeScreenViewModel @Inject constructor(
     private fun refreshPlugins() {
         internalLogInfo("refresh plugins invoked")
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.iolaunch(Dispatchers.IO) {
             val sources = findAllPlugins().mapNotNull(pluginFactory::buildSource).onEach(::onHealthCheckSource)
             val sourceUiList = sources.map(source2SourceUiStateMapper::map)
             updateState {
