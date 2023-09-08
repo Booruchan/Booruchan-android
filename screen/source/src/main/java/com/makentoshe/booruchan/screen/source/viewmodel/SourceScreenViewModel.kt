@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
@@ -21,6 +22,7 @@ import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
+import com.makentoshe.booruchan.screen.Screen
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
@@ -44,6 +46,7 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
+        is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) {
@@ -59,13 +62,13 @@ class SourceScreenViewModel @Inject constructor(
             ?: return updateState { copy(contentState = pluginSourceNullContentState()) }
 
         // update topappbar title
-        updateState { copy(sourceTitle = source.title) }
+        updateState { copy(sourceId = source.id, sourceTitle = source.title) }
 
         // get fetch posts factory or show failure state
         val fetchPostsFactory = source.fetchPostsFactory
             ?: return updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
-        val pagingSource = pagingSourceFactory.buildPost(fetchPostsFactory)
+        val pagingSource = pagingSourceFactory.buildPost(fetchPostsFactory, query = "")
 
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
             pagingSource
@@ -102,6 +105,33 @@ class SourceScreenViewModel @Inject constructor(
         val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
         // Append new tag to current tags
         updateState { copy(searchState = searchState.copy(tags = searchState.tags.plus(tagUiState))) }
+    }
+
+    private fun searchApplyFilters() {
+        internalLogInfo("invoke apply filters event: ${state.searchState.tags}")
+
+        updateState {
+            copy(contentState = ContentState.Loading, backdropValue = BackdropValue.Revealed)
+        }
+
+        // find source from plugin by source id or show failure state
+        val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == state.sourceId }
+            ?: return updateState { copy(contentState = pluginSourceNullContentState()) }
+
+        // get fetch posts factory or show failure state
+        val fetchPostsFactory = source.fetchPostsFactory
+            ?: return updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
+
+        val query = state.searchState.tags.joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
+        val pagingSource = pagingSourceFactory.buildPost(fetchPostsFactory, query)
+
+        val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
+            pagingSource
+        }.flow.cachedIn(viewModelScope)
+
+        updateState {
+            copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
+        }
     }
 
     private fun searchRemoveTag(event: SourceScreenEvent.SearchTagRemove) {

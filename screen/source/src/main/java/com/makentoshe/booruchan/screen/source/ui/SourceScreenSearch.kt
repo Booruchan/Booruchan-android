@@ -1,12 +1,15 @@
 package com.makentoshe.booruchan.screen.source.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +28,7 @@ import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.PrimaryText
 import com.makentoshe.library.uikit.foundation.SecondaryText
+import com.makentoshe.library.uikit.foundation.SecondaryTextBold
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 import com.makentoshe.library.uikit.theme.tag
 
@@ -40,7 +44,15 @@ internal fun SourceScreenSearch(
 
     Spacer(modifier = Modifier.size(16.dp))
 
-    SourceScreenSearchContent(screenState = screenState, screenEvent = screenEvent)
+    Box(modifier = Modifier.weight(1f)) {
+        SourceScreenSearchContent(screenState = screenState, screenEvent = screenEvent)
+    }
+
+    Spacer(modifier = Modifier.size(16.dp))
+
+    Divider(modifier = Modifier.fillMaxWidth(), color = BooruchanTheme.colors.separator)
+
+    SourceScreenSearchFooter(screenState = screenState, screenEvent = screenEvent)
 }
 
 @Composable
@@ -75,7 +87,10 @@ private fun SourceScreenSearchHeader(
 private fun SourceScreenSearchContent(
     screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
-) = Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+) = Column(
+    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+
+) {
     SourceScreenSearchContentGeneral(screenState = screenState, screenEvent = screenEvent)
 }
 
@@ -101,5 +116,18 @@ private fun SourceScreenSearchContentGeneral(
                 ChipItem(state = tagUiState, screenEvent = screenEvent)
             }
         }
+    }
+}
+
+@Composable
+private fun SourceScreenSearchFooter(
+    screenState: SourceScreenState,
+    screenEvent: (SourceScreenEvent) -> Unit,
+) = Column(modifier = Modifier.padding(16.dp)) {
+    Button(
+        modifier = Modifier.fillMaxWidth().height(56.dp),
+        onClick = { screenEvent(SourceScreenEvent.SearchApplyFilters) },
+    ) {
+        SecondaryTextBold(color = BooruchanTheme.colors.background, text = "Apply filters")
     }
 }

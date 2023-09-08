@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.annotation.concurrent.Immutable
 
 data class SourceScreenState(
+    val sourceId: String,
     val sourceTitle: String,
     val backdropValue: BackdropValue,
     val contentState: ContentState,
@@ -19,6 +20,7 @@ data class SourceScreenState(
 ) {
     companion object {
         val InitialState = SourceScreenState(
+            sourceId = "",
             sourceTitle = "",
             backdropValue = BackdropValue.Revealed,
             contentState = ContentState.Loading,
