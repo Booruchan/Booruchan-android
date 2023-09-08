@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
@@ -22,7 +21,6 @@ import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
-import com.makentoshe.booruchan.screen.Screen
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
@@ -49,24 +47,24 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
     }
 
-    private fun initialize(event: SourceScreenEvent.Initialize) {
+    private fun initialize(event: SourceScreenEvent.Initialize) = viewModelScope.iolaunch {
         internalLogInfo("invoke initialize for Source(${event.sourceId})")
 
         // Skip already loaded content
         if (state.contentState !is ContentState.Loading) {
-            return internalLogInfo("skip initialize for Source(${event.sourceId})")
+            return@iolaunch internalLogInfo("skip initialize for Source(${event.sourceId})")
         }
 
         // find source from plugin by source id or show failure state
         val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == event.sourceId }
-            ?: return updateState { copy(contentState = pluginSourceNullContentState()) }
+            ?: return@iolaunch updateState { copy(contentState = pluginSourceNullContentState()) }
 
         // update topappbar title
         updateState { copy(sourceId = source.id, sourceTitle = source.title) }
 
         // get fetch posts factory or show failure state
         val fetchPostsFactory = source.fetchPostsFactory
-            ?: return updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
+            ?: return@iolaunch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
         val pagingSource = pagingSourceFactory.buildPost(fetchPostsFactory, query = "")
 
@@ -84,7 +82,7 @@ class SourceScreenViewModel @Inject constructor(
         updateNavigation { SourceScreenDestination.BackDestination }
     }
 
-    private fun navigationBackdrop() {
+    private fun navigationBackdrop() = viewModelScope.iolaunch {
         internalLogInfo("invoke navigation backdrop: ${state.backdropValue}")
         val newState = when (state.backdropValue) {
             BackdropValue.Concealed -> BackdropValue.Revealed
@@ -97,17 +95,17 @@ class SourceScreenViewModel @Inject constructor(
         updateState { copy(searchState = searchState.copy(value = event.value)) }
     }
 
-    private fun searchAddTag(event: SourceScreenEvent.SearchTagAdd) {
+    private fun searchAddTag(event: SourceScreenEvent.SearchTagAdd) = viewModelScope.iolaunch {
         internalLogInfo("invoke search add tag: ${event.tag}")
         // skip any blank input: we're not interested in it
-        if (event.tag.isBlank()) return internalLogInfo("skip add tag: ${event.tag}")
+        if (event.tag.isBlank()) return@iolaunch internalLogInfo("skip add tag: ${event.tag}")
         // General is a default type for tag
         val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
         // Append new tag to current tags
         updateState { copy(searchState = searchState.copy(tags = searchState.tags.plus(tagUiState))) }
     }
 
-    private fun searchApplyFilters() {
+    private fun searchApplyFilters() = viewModelScope.iolaunch {
         internalLogInfo("invoke apply filters event: ${state.searchState.tags}")
 
         updateState {
@@ -116,11 +114,11 @@ class SourceScreenViewModel @Inject constructor(
 
         // find source from plugin by source id or show failure state
         val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == state.sourceId }
-            ?: return updateState { copy(contentState = pluginSourceNullContentState()) }
+            ?: return@iolaunch updateState { copy(contentState = pluginSourceNullContentState()) }
 
         // get fetch posts factory or show failure state
         val fetchPostsFactory = source.fetchPostsFactory
-            ?: return updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
+            ?: return@iolaunch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
         val query = state.searchState.tags.joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
         val pagingSource = pagingSourceFactory.buildPost(fetchPostsFactory, query)
@@ -134,11 +132,11 @@ class SourceScreenViewModel @Inject constructor(
         }
     }
 
-    private fun searchRemoveTag(event: SourceScreenEvent.SearchTagRemove) {
+    private fun searchRemoveTag(event: SourceScreenEvent.SearchTagRemove) = viewModelScope.iolaunch {
         internalLogInfo("invoke remove tag: ${event.tag}")
 
-        val tagUiState = state.searchState.tags.find{ it.tag == event.tag }
-            ?: return internalLogWarn("could not find tag: ${event.tag}")
+        val tagUiState = state.searchState.tags.find { it.tag == event.tag }
+            ?: return@iolaunch internalLogWarn("could not find tag: ${event.tag}")
 
         updateState { copy(searchState = searchState.copy(tags = searchState.tags.minus(tagUiState))) }
     }
