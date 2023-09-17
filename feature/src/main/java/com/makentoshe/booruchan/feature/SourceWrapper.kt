@@ -1,6 +1,7 @@
 package com.makentoshe.booruchan.feature
 
 import com.makentoshe.booruchan.extension.base.Source
+import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
 import com.makentoshe.booruchan.extension.base.factory.FetchPostsFactory
 import com.makentoshe.booruchan.extension.base.factory.HealthCheckFactory
 
@@ -19,6 +20,9 @@ class SourceWrapper(private val source: Source) : Source {
 
     override val fetchPostsFactory: FetchPostsFactory?
         get() = tryOrNull { source.fetchPostsFactory }
+
+    override val autocompleteSearchFactory: AutocompleteSearchFactory?
+        get() = tryOrNull { source.autocompleteSearchFactory }
 
     /** If source doesn't implemented method this method allows to avoid AME error */
     private fun <T> tryOrNull(action: () -> T?): T? = try {

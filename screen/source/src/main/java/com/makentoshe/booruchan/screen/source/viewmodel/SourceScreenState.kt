@@ -5,6 +5,7 @@ package com.makentoshe.booruchan.screen.source.viewmodel
 import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.paging.PagingData
+import com.makentoshe.booruchan.screen.source.entity.AutocompleteUiState
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
@@ -28,6 +29,7 @@ data class SourceScreenState(
                 value = "",
                 label = "Ex: blue_sky cloud 1girl",
                 tags = emptySet(),
+                autocompleteState = AutocompleteState.None,
             ),
         )
     }
@@ -49,10 +51,26 @@ sealed interface ContentState {
 
 @Immutable
 data class SearchState(
+    /** TextField value */
     val value: String,
+    /** Search example label */
     val label: String,
+    /** All tags that was add to the filter */
     val tags: Set<TagUiState>,
+    /** Autocompletion state */
+    val autocompleteState: AutocompleteState,
 ) {
     val generalTags: List<TagUiState>
         get() = tags.filter { it.type == TagType.General }
+}
+
+@Immutable
+sealed interface AutocompleteState {
+    object None: AutocompleteState
+
+    object Loading: AutocompleteState
+
+    data class Content(
+        val autocomplete: Set<AutocompleteUiState>,
+    ): AutocompleteState
 }
