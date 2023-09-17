@@ -42,6 +42,8 @@ internal fun SearchTextField(
         unfocusedContainerColor = BooruchanTheme.colors.separator,
         focusedContainerColor = BooruchanTheme.colors.separator,
     ),
+    trailingIcon: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
 ) = TextField(
     modifier = modifier,
     value = value,
@@ -52,4 +54,6 @@ internal fun SearchTextField(
     label = label,
     keyboardOptions = keyboardOptions,
     keyboardActions = keyboardActions,
+    trailingIcon = trailingIcon,
+    suffix = suffix,
 )

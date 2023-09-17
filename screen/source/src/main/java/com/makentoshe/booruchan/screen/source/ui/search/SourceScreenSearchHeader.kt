@@ -2,9 +2,12 @@
 
 package com.makentoshe.booruchan.screen.source.ui.search
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -14,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -24,6 +28,8 @@ import com.makentoshe.booruchan.screen.source.ui.component.SearchTextField
 import com.makentoshe.booruchan.screen.source.viewmodel.AutocompleteState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
+import com.makentoshe.library.uikit.foundation.CloseIcon
+import com.makentoshe.library.uikit.foundation.IndeterminateProgressBar
 import com.makentoshe.library.uikit.foundation.PrimaryText
 
 @Composable
@@ -58,7 +64,10 @@ internal fun SourceScreenSearchHeader(
             onDone = {
                 keyboardController?.hide()
             }
-        )
+        ),
+        suffix = {
+            SourceScreenSearchHeaderTextFieldSuffix(screenState = screenState, screenEvent = screenEvent)
+        }
     )
 
     var dropdownMenuExpanded by remember(key1 = screenState.searchState.autocompleteState) {
@@ -84,5 +93,21 @@ internal fun SourceScreenSearchHeader(
                 },
             )
         }
+    }
+}
+
+@Composable
+private fun SourceScreenSearchHeaderTextFieldSuffix(
+    screenState: SourceScreenState,
+    screenEvent: (SourceScreenEvent) -> Unit,
+) = Box(modifier = Modifier.size(36.dp), contentAlignment = Alignment.Center) {
+    if (screenState.searchState.autocompleteState is AutocompleteState.Loading) {
+        IndeterminateProgressBar(modifier = Modifier.padding(4.dp), strokeWidth = 3.dp)
+    }
+
+    if (screenState.searchState.value.isNotEmpty()) {
+        CloseIcon(modifier = Modifier.clickable {
+            screenEvent(SourceScreenEvent.SearchValueChange(value = ""))
+        })
     }
 }
