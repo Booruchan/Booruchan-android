@@ -5,30 +5,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.library.resources.R
 import com.makentoshe.booruchan.screen.source.ui.component.ChipGroup
 import com.makentoshe.booruchan.screen.source.ui.component.ChipItem
-import com.makentoshe.booruchan.screen.source.ui.component.SearchTextField
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
-import com.makentoshe.library.uikit.foundation.PrimaryText
 import com.makentoshe.library.uikit.foundation.SecondaryText
-import com.makentoshe.library.uikit.foundation.SecondaryTextBold
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 import com.makentoshe.library.uikit.theme.tag
 
@@ -37,12 +29,13 @@ internal fun SourceScreenSearch(
     screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(modifier = Modifier.fillMaxSize()) {
-
-    SourceScreenSearchHeader(screenState = screenState, screenEvent = screenEvent)
+    SourceScreenSearchHeader(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        screenState = screenState,
+        screenEvent = screenEvent,
+    )
 
     Divider(modifier = Modifier.fillMaxWidth(), color = BooruchanTheme.colors.separator)
-
-    Spacer(modifier = Modifier.size(16.dp))
 
     Box(modifier = Modifier.weight(1f)) {
         SourceScreenSearchContent(screenState = screenState, screenEvent = screenEvent)
@@ -62,7 +55,6 @@ private fun SourceScreenSearchContent(
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(
     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-
 ) {
     SourceScreenSearchContentGeneral(screenState = screenState, screenEvent = screenEvent)
 }
@@ -77,6 +69,8 @@ private fun SourceScreenSearchContentGeneral(
     }
 
     if (generalTags.isNotEmpty()) {
+        Spacer(modifier = Modifier.size(16.dp))
+
         SecondaryText(
             text = stringResource(id = R.string.source_search_tags_general),
             color = BooruchanTheme.colors.tag.general,
