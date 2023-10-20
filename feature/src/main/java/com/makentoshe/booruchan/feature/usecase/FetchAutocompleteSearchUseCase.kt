@@ -6,9 +6,9 @@ import com.makentoshe.booruchan.feature.mapper.NetworkAutocomplete2AutocompleteM
 import com.makentoshe.booruchan.feature.network.NetworkRepository
 import javax.inject.Inject
 
-class AutocompleteSearchUseCase @Inject constructor(
+class FetchAutocompleteSearchUseCase @Inject constructor(
     private val networkRepository: NetworkRepository,
-    private val mapper: NetworkAutocomplete2AutocompleteMapper,
+    private val networkMapper: NetworkAutocomplete2AutocompleteMapper,
 ) {
     suspend operator fun invoke(
         autocompleteSearchFactory: AutocompleteSearchFactory,
@@ -17,6 +17,6 @@ class AutocompleteSearchUseCase @Inject constructor(
         val networkRequest = autocompleteSearchFactory.buildRequest(request = request)
         val networkResponse = networkRepository.execute(request = networkRequest)
         val networkAutocompletes = autocompleteSearchFactory.parseResponse(response = networkResponse)
-        return networkAutocompletes.map(mapper::map)
+        return networkAutocompletes.map(networkMapper::map)
     }
 }

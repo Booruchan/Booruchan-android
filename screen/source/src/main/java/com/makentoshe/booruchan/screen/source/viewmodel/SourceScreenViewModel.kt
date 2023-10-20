@@ -12,7 +12,8 @@ import androidx.paging.cachedIn
 import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
 import com.makentoshe.booruchan.feature.PluginFactory
-import com.makentoshe.booruchan.feature.usecase.AutocompleteSearchUseCase
+import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase
+import com.makentoshe.booruchan.feature.usecase.SetAutocompleteSearchUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -32,7 +33,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,7 +40,8 @@ import javax.inject.Inject
 class SourceScreenViewModel @Inject constructor(
     private val pluginFactory: PluginFactory,
     private val findAllPlugins: GetAllPluginsUseCase,
-    private val autocompleteSearch: AutocompleteSearchUseCase,
+    private val fetchAutocompleteSearch: FetchAutocompleteSearchUseCase,
+    private val setAutocompleteSearch: SetAutocompleteSearchUseCase,
     private val pagingSourceFactory: PagingSourceFactory,
     private val autocompleteUiStateMapper: Autocomplete2AutocompleteUiStateMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
@@ -113,32 +114,42 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
         internalLogInfo("invoke search value change: ${event.value} ${autocompleteJob?.isActive}")
+
         updateState {
             copy(searchState = searchState.copy(value = event.value, autocompleteState = AutocompleteState.None))
         }
+
         autocompleteJob?.cancel() // cancel previous autocomplete job
-        autocompleteJob = viewModelScope.launch(Dispatchers.IO) {
-            // finish job immediately if source is not initialized
-            if (!this@SourceScreenViewModel::source.isInitialized) return@launch
-            // finish job immediately on empty search
-            if (event.value.isEmpty()) return@launch
-            // delay between input and autocomplete starting
-            delay(350)
-            updateState { copy(searchState = searchState.copy(autocompleteState = AutocompleteState.Loading)) }
-            internalLogInfo("invoke autocomplete search: ${event.value}")
-            // find source from plugin by source id or show failure state
-            val autocompleteSearchFactory = this@SourceScreenViewModel.source.autocompleteSearchFactory
-                ?: return@launch internalLogWarn("autocomplete search factory is not implemented")
-            // return if autocomplete search factory is not implemented
-            // request autocompletion
-            val autocompleteSearchRequest = AutocompleteSearchFactory.AutocompleteSearchRequest(event.value)
-            val autocompletes = autocompleteSearch(autocompleteSearchFactory, autocompleteSearchRequest)
-            val autocompleteUiStates = autocompletes.map(autocompleteUiStateMapper::map).toSet()
-            internalLogInfo("autocomplete search success: $autocompletes")
-            // show autocompletion
-            updateState {
-                copy(searchState = searchState.copy(autocompleteState = AutocompleteState.Content(autocompleteUiStates)))
-            }
+        autocompleteJob = viewModelScope.launch(Dispatchers.IO) { fetchAutocomplete(event.value) }
+    }
+
+    private suspend fun fetchAutocomplete(autocompleteSearchValue: String) {
+        // finish job immediately if source is not initialized
+        if (!this@SourceScreenViewModel::source.isInitialized) return
+        // finish job immediately on empty search
+        if (autocompleteSearchValue.isEmpty()) return
+        // delay between input and autocomplete starting
+        delay(350)
+
+        updateState { copy(searchState = searchState.copy(autocompleteState = AutocompleteState.Loading)) }
+        internalLogInfo("invoke autocomplete search: $autocompleteSearchValue")
+
+        // find source from plugin by source id or show failure state
+        // return if autocomplete search factory is not implemented
+        val autocompleteSearchFactory = this@SourceScreenViewModel.source.autocompleteSearchFactory
+            ?: return internalLogWarn("autocomplete search factory is not implemented")
+
+        // request autocompletion
+        val autocompleteSearchRequest = AutocompleteSearchFactory.AutocompleteSearchRequest(autocompleteSearchValue)
+        val autocompletes = fetchAutocompleteSearch(autocompleteSearchFactory, autocompleteSearchRequest)
+        val autocompleteUiStates = autocompletes.map(autocompleteUiStateMapper::map).toSet()
+        // store autocomplete tags to tags database
+        setAutocompleteSearch(source, autocompletes)
+
+        // show autocompletion
+        internalLogInfo("autocomplete search success: $autocompletes")
+        updateState {
+            copy(searchState = searchState.copy(autocompleteState = AutocompleteState.Content(autocompleteUiStates)))
         }
     }
 

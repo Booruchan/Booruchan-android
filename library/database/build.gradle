@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.makentoshe.booruchan.feature'
+    namespace 'com.makentoshe.booruchan.library.database'
     compileSdk project_compile_sdk
 
     defaultConfig {
@@ -32,15 +32,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":library:plugin"))
-    implementation(project(":library:database"))
+    implementation "androidx.core:core-ktx:$android_core_version"
 
-    implementation "com.github.Makentoshe:Booruchan-extension-base:$booruchan_plugin_version"
-
-    // Ktor
-    implementation "io.ktor:ktor-client-core:$ktor_version"
-
-    // Database
     implementation "androidx.room:room-runtime:$android_room_version"
     kapt "androidx.room:room-compiler:$android_room_version"
 
