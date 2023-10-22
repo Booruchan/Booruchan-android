@@ -15,12 +15,16 @@ import javax.inject.Singleton
 abstract class DatabaseModule {
     companion object {
 
+        private const val ApplicationDatabaseName = "ApplicationDatabase"
+
         @Singleton
         @Provides
-        fun provideApplicationDatabase(@ApplicationContext applicationContext: Context) = Room.databaseBuilder(
+        fun provideApplicationDatabase(
+            @ApplicationContext applicationContext: Context,
+        ) = Room.databaseBuilder(
             /* context = */ applicationContext,
             /* klass = */ ApplicationDatabase::class.java,
-            /* name = */ "ApplicationDatabase"
+            /* name = */ ApplicationDatabaseName,
         ).fallbackToDestructiveMigration().build()
     }
 }

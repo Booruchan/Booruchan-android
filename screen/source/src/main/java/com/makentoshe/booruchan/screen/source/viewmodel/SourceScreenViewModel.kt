@@ -87,7 +87,7 @@ class SourceScreenViewModel @Inject constructor(
         val fetchPostsFactory = source.fetchPostsFactory
             ?: return@iolaunch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
-        val pagingSource = pagingSourceFactory.buildPost(fetchPostsFactory, query = "")
+        val pagingSource = pagingSourceFactory.buildPost(source = source, fetchPostsFactory, query = "")
 
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
             pagingSource
@@ -187,7 +187,7 @@ class SourceScreenViewModel @Inject constructor(
             ?: return@iolaunch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
         val query = state.searchState.tags.joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
-        val pagingSource = pagingSourceFactory.buildPost(fetchPostsFactory, query)
+        val pagingSource = pagingSourceFactory.buildPost(source = source, fetchPostsFactory, query)
 
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
             pagingSource

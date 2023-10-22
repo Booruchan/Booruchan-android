@@ -5,19 +5,19 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.makentoshe.booruchan.library.database.entity.DatabaseTag
+import com.makentoshe.booruchan.library.database.entity.DatabasePost
 
 @Dao
-interface DatabaseTagDao {
-    @Query("SELECT * FROM DatabaseTag")
-    fun getAll(): List<DatabaseTag>
+interface DatabasePostDao {
+    @Query("SELECT * FROM DatabasePost")
+    fun getAll(): List<DatabasePost>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(tag: DatabaseTag)
+    fun insert(tag: DatabasePost)
 
     @Delete
-    fun delete(tag: DatabaseTag)
+    fun delete(tag: DatabasePost)
 
-    @Query("DELETE FROM DatabaseTag")
+    @Query("DELETE FROM DatabasePost")
     fun clear()
 }

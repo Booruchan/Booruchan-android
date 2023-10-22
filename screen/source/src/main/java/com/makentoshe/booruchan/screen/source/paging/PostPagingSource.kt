@@ -2,14 +2,23 @@ package com.makentoshe.booruchan.screen.source.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.FetchPostsFactory
+import com.makentoshe.booruchan.feature.SourceWrapper
 import com.makentoshe.booruchan.feature.fetchposts.FetchPostsUseCase
+import com.makentoshe.booruchan.feature.usecase.SetPostsUseCase
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
 import com.makentoshe.booruchan.screen.source.mapper.Post2PreviewPostUiStateMapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostPagingSource @Inject constructor(
+    /** Fetching posts from network */
     private val fetchPosts: FetchPostsUseCase,
+    /** Set posts to local storage */
+    private val setPosts: SetPostsUseCase,
+    private val source: Source,
     private val fetchPostsFactory: FetchPostsFactory,
     private val mapper: Post2PreviewPostUiStateMapper,
     private val query: String,
@@ -38,10 +47,14 @@ class PostPagingSource @Inject constructor(
         val postsPerPage = params.loadSize
 
         val fetchPostsRequest = FetchPostsFactory.FetchPostsRequest(postsPerPage, nextPageNumber, query)
-        val response = fetchPosts(fetchPostsFactory, fetchPostsRequest)
+        val fetchPostsResponse = fetchPosts(fetchPostsFactory, fetchPostsRequest)
 
+        // store posts in the database
+        withContext(Dispatchers.IO) { setPosts(source = source, posts = fetchPostsResponse) }
+
+        // publish the response
         return LoadResult.Page(
-            data = response.map(mapper::map),
+            data = fetchPostsResponse.map(mapper::map),
             prevKey = null, // Only paging forward.
             nextKey = nextPageNumber + 1
         )
