@@ -9,7 +9,7 @@ class Post2DatabasePostMapper @Inject constructor() {
 
     fun map(source: Source, networkPost: Post) = DatabasePost(
         id = networkPost.id,
-        source = source.title,
+        source = source.id,
         previewImageUrl = networkPost.previewImageUrl,
         previewImageHeight = networkPost.previewImageHeight,
         previewImageWidth = networkPost.previewImageWidth,

@@ -9,6 +9,7 @@ import com.makentoshe.booruchan.feature.usecase.SetPostsUseCase
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
 import com.makentoshe.booruchan.screen.source.mapper.Post2PreviewPostUiStateMapper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -49,7 +50,9 @@ class PostPagingSource @Inject constructor(
         val fetchPostsResponse = fetchPosts(fetchPostsFactory, fetchPostsRequest)
 
         // store posts in the database
-        withContext(Dispatchers.IO) { setPosts(source = source, posts = fetchPostsResponse) }
+        withContext(Dispatchers.IO) {
+            launch { setPosts(source = source, posts = fetchPostsResponse)  }
+        }
 
         // publish the response
         return LoadResult.Page(

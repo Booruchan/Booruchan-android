@@ -11,7 +11,7 @@ class SetAutocompleteSearchUseCase @Inject constructor(
     private val mapper: Autocomplete2DatabaseTagMapper,
 ) {
     suspend operator fun invoke(source: Source, autocompletes: List<Autocomplete>) {
-        autocompletes.map { mapper.map(source.title, it) }.forEach { databaseTag ->
+        autocompletes.map { mapper.map(source, it) }.forEach { databaseTag ->
             applicationDatabase.tagDao().insert(databaseTag)
         }
     }
