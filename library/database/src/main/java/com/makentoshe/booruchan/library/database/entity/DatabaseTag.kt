@@ -6,12 +6,12 @@ import androidx.room.PrimaryKey
 @Entity
 data class DatabaseTag(
     /** Title of the source (gelbooru, google, pixiv) */
-    val sourceTitle: String,
+    val source: String,
     /** Title of the tag (sky, blue eyes, etc) */
-    val tagTitle: String,
+    val title: String,
     /** Tag value (sky, blue_eyes, etc) */
     @PrimaryKey
     val value: String,
-    /** How many posts with this tag in the source with [sourceTitle] */
+    /** How many posts with this tag in the source with [source] */
     val count: Int,
 )

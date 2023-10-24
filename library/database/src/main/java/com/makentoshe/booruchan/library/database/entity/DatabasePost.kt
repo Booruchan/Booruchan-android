@@ -2,12 +2,12 @@ package com.makentoshe.booruchan.library.database.entity
 
 import androidx.room.Entity
 
-@Entity(primaryKeys = ["sourceId", "sourceTitle"])
+@Entity(primaryKeys = ["id", "source"])
 data class DatabasePost(
     /** Title of the source (gelbooru, google, pixiv) */
-    val sourceTitle: String,
+    val source: String,
     /** Id in the source */
-    val sourceId: String,
+    val id: String,
 
     val previewImageUrl: String,
     val previewImageWidth: Int,

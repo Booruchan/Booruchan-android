@@ -6,8 +6,8 @@ import javax.inject.Inject
 
 class Autocomplete2DatabaseTagMapper @Inject constructor() {
     fun map(sourceTitle: String, autocomplete: Autocomplete) = DatabaseTag(
-        sourceTitle = sourceTitle,
-        tagTitle = autocomplete.title,
+        source = sourceTitle,
+        title = autocomplete.title,
         value = autocomplete.value,
         count = autocomplete.count,
     )

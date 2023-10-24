@@ -12,7 +12,7 @@ import com.makentoshe.booruchan.library.database.entity.DatabaseTag
         DatabaseTag::class,
         DatabasePost::class,
     ],
-    version = 3,
+    version = 5,
 )
 abstract class ApplicationDatabase : RoomDatabase() {
 

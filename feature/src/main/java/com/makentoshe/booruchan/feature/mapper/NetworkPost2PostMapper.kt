@@ -7,6 +7,7 @@ import javax.inject.Inject
 class NetworkPost2PostMapper @Inject constructor() {
     fun map(networkPost: NetworkPost) = Post(
         id = networkPost.id.toString(),
+        tags = networkPost.tags,
         previewImageUrl = networkPost.previewImageUrl,
         previewImageHeight = networkPost.previewImageHeight,
         previewImageWidth = networkPost.previewImageWidth,
