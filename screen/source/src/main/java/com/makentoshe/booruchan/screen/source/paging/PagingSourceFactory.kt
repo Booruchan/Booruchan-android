@@ -2,7 +2,7 @@ package com.makentoshe.booruchan.screen.source.paging
 
 import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.FetchPostsFactory
-import com.makentoshe.booruchan.feature.fetchposts.FetchPostsUseCase
+import com.makentoshe.booruchan.feature.usecase.FetchPostsUseCase
 import com.makentoshe.booruchan.feature.usecase.SetPostsUseCase
 import com.makentoshe.booruchan.screen.source.mapper.Post2PreviewPostUiStateMapper
 import javax.inject.Inject

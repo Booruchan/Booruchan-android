@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.feature.fetchposts
+package com.makentoshe.booruchan.feature.usecase
 
 import com.makentoshe.booruchan.extension.base.factory.FetchPostsFactory
 import com.makentoshe.booruchan.feature.entity.Post
