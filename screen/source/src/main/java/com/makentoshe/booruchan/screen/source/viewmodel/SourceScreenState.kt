@@ -10,6 +10,7 @@ import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import javax.annotation.concurrent.Immutable
 
 data class SourceScreenState(
@@ -66,11 +67,11 @@ data class SearchState(
 
 @Immutable
 sealed interface AutocompleteState {
-    object None: AutocompleteState
+    object None : AutocompleteState
 
-    object Loading: AutocompleteState
+    object Loading : AutocompleteState
 
     data class Content(
         val autocomplete: Set<AutocompleteUiState>,
-    ): AutocompleteState
+    ) : AutocompleteState
 }

@@ -12,11 +12,11 @@ class PagingSourceFactory @Inject constructor(
     private val setPosts: SetPostsUseCase,
     private val mapper: Post2PreviewPostUiStateMapper,
 ) {
-    fun buildPost(source: Source, factory: FetchPostsFactory, query: String): PostPagingSource {
+    fun buildPostPagingSource(source: Source, factory: FetchPostsFactory, query: String): PostPagingSource {
         return PostPagingSource(fetchPosts = fetchPosts, setPosts = setPosts, source = source, fetchPostsFactory = factory, mapper = mapper, query = query)
     }
 
-    fun buildError(throwable: Throwable): ErrorPagingSource {
+    fun buildErrorPagingSource(throwable: Throwable): ErrorPagingSource {
         return ErrorPagingSource(throwable)
     }
 }

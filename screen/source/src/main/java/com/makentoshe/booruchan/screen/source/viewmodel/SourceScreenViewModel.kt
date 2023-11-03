@@ -33,6 +33,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -71,9 +72,9 @@ class SourceScreenViewModel @Inject constructor(
         internalLogInfo("invoke initialize for Source(${event.sourceId})")
 
         // Skip already loaded content
-        if (state.contentState !is ContentState.Loading) {
-            return@iolaunch internalLogInfo("skip initialize for Source(${event.sourceId})")
-        }
+//        if (state.contentState.pagerFlow ) {
+//            return@iolaunch internalLogInfo("skip initialize for Source(${event.sourceId})")
+//        }
 
         // find source from plugin by source id or show failure state
         val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == event.sourceId }
@@ -87,10 +88,8 @@ class SourceScreenViewModel @Inject constructor(
         val fetchPostsFactory = source.fetchPostsFactory
             ?: return@iolaunch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
-        val pagingSource = pagingSourceFactory.buildPost(source = source, fetchPostsFactory, query = "")
-
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
-            pagingSource
+            pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, query = "")
         }.flow.cachedIn(viewModelScope)
 
         updateState {
@@ -187,10 +186,9 @@ class SourceScreenViewModel @Inject constructor(
             ?: return@iolaunch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
         val query = state.searchState.tags.joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
-        val pagingSource = pagingSourceFactory.buildPost(source = source, fetchPostsFactory, query)
 
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
-            pagingSource
+            pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, query)
         }.flow.cachedIn(viewModelScope)
 
         updateState {

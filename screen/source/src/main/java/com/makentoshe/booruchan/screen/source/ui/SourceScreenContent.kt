@@ -74,20 +74,16 @@ private fun SourceScreenContentSuccess(
 ) {
     val previewPostItems = contentState.pagerFlow.collectAsLazyPagingItems()
     val refreshState = previewPostItems.loadState.refresh
-    val prependState = previewPostItems.loadState.prepend
 
     when {
-        refreshState is LoadState.Loading && !prependState.endOfPaginationReached -> {
+        refreshState is LoadState.Loading && previewPostItems.itemSnapshotList.isEmpty() -> {
             SourceScreenContentLoading()
         }
         refreshState is LoadState.Error -> {
             SourceScreenContentFailure("", description = refreshState.error.toString())
         }
         else -> {
-            SourceLazyVerticalStaggeredGrid(
-                screenState = screenState,
-                contentState = contentState,
-            )
+            SourceLazyVerticalStaggeredGrid(screenState = screenState, contentState = contentState)
         }
     }
 }
