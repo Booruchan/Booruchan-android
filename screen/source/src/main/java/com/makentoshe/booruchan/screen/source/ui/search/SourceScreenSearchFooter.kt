@@ -35,7 +35,7 @@ internal fun SourceScreenSearchFooter(
         },
     ) {
         SecondaryTextBold(
-            color = BooruchanTheme.colors.background,
+            color = BooruchanTheme.colors.foreground,
             text = stringResource(id = R.string.source_search_apply_filters_button),
         )
     }
