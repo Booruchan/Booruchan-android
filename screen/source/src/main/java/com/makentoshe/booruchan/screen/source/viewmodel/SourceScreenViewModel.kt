@@ -12,8 +12,10 @@ import androidx.paging.cachedIn
 import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
 import com.makentoshe.booruchan.feature.PluginFactory
+import com.makentoshe.booruchan.feature.entity.SourceSearchSnapshot
 import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase
 import com.makentoshe.booruchan.feature.usecase.SetAutocompleteSearchUseCase
+import com.makentoshe.booruchan.feature.usecase.SetSearchSnapshotUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -33,7 +35,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,6 +44,7 @@ class SourceScreenViewModel @Inject constructor(
     private val findAllPlugins: GetAllPluginsUseCase,
     private val fetchAutocompleteSearch: FetchAutocompleteSearchUseCase,
     private val setAutocompleteSearch: SetAutocompleteSearchUseCase,
+    private val setSourceNavigation: SetSearchSnapshotUseCase,
     private val pagingSourceFactory: PagingSourceFactory,
     private val autocompleteUiStateMapper: Autocomplete2AutocompleteUiStateMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
@@ -66,15 +68,16 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
         is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
+        is SourceScreenEvent.StoreSourceSearch -> storeSourceSearch()
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) = viewModelScope.iolaunch {
         internalLogInfo("invoke initialize for Source(${event.sourceId})")
 
         // Skip already loaded content
-//        if (state.contentState.pagerFlow ) {
-//            return@iolaunch internalLogInfo("skip initialize for Source(${event.sourceId})")
-//        }
+        if (state.contentState !is ContentState.Loading) {
+            return@iolaunch internalLogInfo("skip initialize for Source(${event.sourceId})")
+        }
 
         // find source from plugin by source id or show failure state
         val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == event.sourceId }
@@ -168,6 +171,17 @@ class SourceScreenViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    private fun storeSourceSearch() = viewModelScope.iolaunch {
+        internalLogInfo("invoke apply filters event: ${state.searchState.tags}")
+
+        // get fetch posts factory or do nothing
+        val fetchPostsFactory = source.fetchPostsFactory ?: return@iolaunch
+
+        val tags = state.searchState.tags.joinToString(separator = fetchPostsFactory.searchTagSeparator) { it.tag }
+        val sourceSearchNavigation = SourceSearchSnapshot(source = source.id, tags = tags)
+        setSourceNavigation(sourceSearchNavigation)
     }
 
     private fun searchApplyFilters() = viewModelScope.iolaunch {

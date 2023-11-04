@@ -34,7 +34,8 @@ android {
 dependencies {
     implementation "androidx.core:core-ktx:$android_core_version"
 
-    implementation "androidx.room:room-runtime:$android_room_version"
+    api "androidx.room:room-runtime:$android_room_version"
+    api "androidx.room:room-ktx:$android_room_version"
     kapt "androidx.room:room-compiler:$android_room_version"
 
     // Dagger and Hilt

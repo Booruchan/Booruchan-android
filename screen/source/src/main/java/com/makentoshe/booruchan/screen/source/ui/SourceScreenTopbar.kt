@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,10 +31,11 @@ internal fun SourceScreenTopbar(
             TopbarTitle(screenState = screenState)
         },
         navigationIcon = {
-            TopbarNavigationIcon(screenState = screenState, screenEvent = screenEvent)
+            TopbarNavigationIcon(screenEvent = screenEvent)
         },
         actions = {
-            TopbarActionIcon(screenState = screenState, screenEvent = screenEvent)
+            TopbarActionIcon(screenEvent = screenEvent)
+            TopbarStarIcon(screenEvent = screenEvent)
         }
     )
 
@@ -44,7 +47,6 @@ internal fun SourceScreenTopbar(
 
 @Composable
 private fun TopbarNavigationIcon(
-    screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Box(
     modifier = Modifier.size(48.dp).clickable {
@@ -62,7 +64,6 @@ private fun TopbarTitle(screenState: SourceScreenState) = TitleText(
 
 @Composable
 private fun TopbarActionIcon(
-    screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Box(
     modifier = Modifier.size(48.dp).clickable {
@@ -70,4 +71,15 @@ private fun TopbarActionIcon(
     },
     contentAlignment = Alignment.Center,
     content = { MagnifyIcon() }
+)
+
+@Composable
+private fun TopbarStarIcon(
+    screenEvent: (SourceScreenEvent) -> Unit,
+) = Box(
+    modifier = Modifier.size(48.dp).clickable {
+        screenEvent(SourceScreenEvent.StoreSourceSearch)
+    },
+    contentAlignment = Alignment.Center,
+    content = { Icons.Outlined.Star }
 )
