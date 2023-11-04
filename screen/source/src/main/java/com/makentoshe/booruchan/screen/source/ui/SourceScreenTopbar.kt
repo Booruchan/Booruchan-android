@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Divider
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +15,7 @@ import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.ArrowBackIcon
 import com.makentoshe.library.uikit.foundation.MagnifyIcon
+import com.makentoshe.library.uikit.foundation.StarIcon
 import com.makentoshe.library.uikit.foundation.TitleText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
@@ -34,8 +33,8 @@ internal fun SourceScreenTopbar(
             TopbarNavigationIcon(screenEvent = screenEvent)
         },
         actions = {
-            TopbarActionIcon(screenEvent = screenEvent)
             TopbarStarIcon(screenEvent = screenEvent)
+            TopbarActionIcon(screenEvent = screenEvent)
         }
     )
 
@@ -81,5 +80,5 @@ private fun TopbarStarIcon(
         screenEvent(SourceScreenEvent.StoreSourceSearch)
     },
     contentAlignment = Alignment.Center,
-    content = { Icons.Outlined.Star }
+    content = { StarIcon() }
 )
