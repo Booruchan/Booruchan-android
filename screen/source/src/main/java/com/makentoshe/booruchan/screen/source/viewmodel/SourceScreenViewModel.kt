@@ -12,7 +12,7 @@ import androidx.paging.cachedIn
 import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
 import com.makentoshe.booruchan.feature.PluginFactory
-import com.makentoshe.booruchan.feature.entity.SourceSearchSnapshot
+import com.makentoshe.booruchan.feature.entity.SearchSnapshot
 import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase
 import com.makentoshe.booruchan.feature.usecase.SetAutocompleteSearchUseCase
 import com.makentoshe.booruchan.feature.usecase.SetSearchSnapshotUseCase
@@ -180,7 +180,7 @@ class SourceScreenViewModel @Inject constructor(
         val fetchPostsFactory = source.fetchPostsFactory ?: return@iolaunch
 
         val tags = state.searchState.tags.joinToString(separator = fetchPostsFactory.searchTagSeparator) { it.tag }
-        val sourceSearchNavigation = SourceSearchSnapshot(source = source.id, tags = tags)
+        val sourceSearchNavigation = SearchSnapshot(source = source.id, tags = tags)
         setSourceNavigation(sourceSearchNavigation)
     }
 

@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.usecase
 
-import com.makentoshe.booruchan.feature.entity.SourceSearchSnapshot
+import com.makentoshe.booruchan.feature.entity.SearchSnapshot
 import com.makentoshe.booruchan.library.database.SearchSnapshotDatabase
 import com.makentoshe.booruchan.library.database.entity.DatabaseSearchSnapshot
 import javax.inject.Inject
@@ -9,7 +9,7 @@ import javax.inject.Inject
 class SetSearchSnapshotUseCase @Inject constructor(
     private val searchSnapshotDatabase: SearchSnapshotDatabase,
 ) {
-    suspend operator fun invoke(sourceSearchNavigation: SourceSearchSnapshot) {
+    suspend operator fun invoke(sourceSearchNavigation: SearchSnapshot) {
         val databaseNavigation = DatabaseSearchSnapshot(source = sourceSearchNavigation.source, tags = sourceSearchNavigation.tags)
         searchSnapshotDatabase.sourceSearchSnapshotDao().insert(databaseNavigation)
     }

@@ -11,7 +11,7 @@ internal fun MainActivityComposeContent() = BooruchanTheme {
 
     ModalNavigationDrawer(
         drawerState = rememberDrawerState(navController = navController),
-        drawerContent = { MainActivityDrawerContent() },
-        content = { MainActivityNavigationContent(navHostController = navController) }
+        drawerContent = { MainActivityDrawerContent(navHostController = navController) },
+        content = { MainActivityNavigationContent(navHostController = navController) },
     )
 }

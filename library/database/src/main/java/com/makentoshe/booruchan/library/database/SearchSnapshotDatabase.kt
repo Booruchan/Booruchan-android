@@ -7,7 +7,7 @@ import com.makentoshe.booruchan.library.database.entity.DatabaseSearchSnapshot
 
 @Database(
     entities = [DatabaseSearchSnapshot::class],
-    version = 3,
+    version = 5,
 )
 abstract class SearchSnapshotDatabase : RoomDatabase() {
 

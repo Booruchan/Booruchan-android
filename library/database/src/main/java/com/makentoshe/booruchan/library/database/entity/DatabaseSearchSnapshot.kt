@@ -4,13 +4,11 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- *  Stores whole info about source screen: source id and
+ * Stores whole info about source screen: source id and
  * search preferences for future restoration
  * */
-@Entity
+@Entity(primaryKeys = ["source", "tags"])
 data class DatabaseSearchSnapshot(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
     val source: String,
     val tags: String,
 )
