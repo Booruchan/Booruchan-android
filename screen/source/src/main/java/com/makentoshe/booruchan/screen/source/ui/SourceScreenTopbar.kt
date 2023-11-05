@@ -33,7 +33,7 @@ internal fun SourceScreenTopbar(
             TopbarNavigationIcon(screenEvent = screenEvent)
         },
         actions = {
-            TopbarStarIcon(screenEvent = screenEvent)
+//            TopbarStarIcon(screenEvent = screenEvent)
             TopbarActionIcon(screenEvent = screenEvent)
         }
     )
