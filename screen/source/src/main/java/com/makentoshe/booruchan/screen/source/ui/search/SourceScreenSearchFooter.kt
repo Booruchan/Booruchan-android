@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ internal fun SourceScreenSearchFooter(
 
     Button(
         modifier = Modifier.fillMaxWidth().height(56.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = BooruchanTheme.colors.opaque),
         onClick = {
             keyboardController?.hide()
             screenEvent(SourceScreenEvent.SearchApplyFilters)

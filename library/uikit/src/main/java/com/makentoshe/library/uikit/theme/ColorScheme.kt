@@ -22,6 +22,13 @@ val LightColorScheme = BooruchanColorScheme(
     foreground = Black,
     dashboard = Grey10,
     separator = Grey32,
+    tag = BooruchanTagScheme(
+        general = Black,
+        artist = Red500,
+        character = Green500,
+        copyright = Purple500,
+        metadata = Amber500,
+    )
 )
 
 
@@ -35,6 +42,13 @@ val DarkColorScheme = BooruchanColorScheme(
     foreground = White,
     dashboard = Grey10,
     separator = Grey75,
+    tag = BooruchanTagScheme(
+        general = White,
+        artist = Red500,
+        character = Green500,
+        copyright = Purple500,
+        metadata = Amber500,
+    )
 )
 
 val DarkMaterialColorScheme = darkColorScheme(
@@ -56,6 +70,7 @@ data class BooruchanColorScheme(
     val background: Color,
     val dashboard: Color,
     val separator: Color,
+    val tag: BooruchanTagScheme
 )
 
 val BooruchanColorScheme.transparent: Color
@@ -63,16 +78,6 @@ val BooruchanColorScheme.transparent: Color
 
 val BooruchanColorScheme.error: Color
     get() = Color.Red
-
-
-val BooruchanColorScheme.tag: BooruchanTagScheme
-    get() = BooruchanTagScheme(
-        general = Color.Black,
-        artist = Red500,
-        character = Green500,
-        copyright = Purple500,
-        metadata = Amber500,
-    )
 
 data class BooruchanTagScheme(
     val general: Color,

@@ -22,7 +22,6 @@ import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
-import com.makentoshe.library.uikit.theme.tag
 
 @Composable
 internal fun SourceScreenSearch(
