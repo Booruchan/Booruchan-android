@@ -24,9 +24,12 @@ import com.makentoshe.booruchan.library.feature.DefaultStateDelegate
 import com.makentoshe.booruchan.library.feature.EventDelegate
 import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
+import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEntityMapper
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
+import com.makentoshe.booruchan.library.resources.GetStringUseCase
+import com.makentoshe.booruchan.screen.source.R
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
@@ -47,6 +50,7 @@ class SourceScreenViewModel @Inject constructor(
     private val setSourceNavigation: SetSearchSnapshotUseCase,
     private val pagingSourceFactory: PagingSourceFactory,
     private val autocompleteUiStateMapper: Autocomplete2AutocompleteUiStateMapper,
+    private val throwable2ThrowableEntityMapper: Throwable2ThrowableEntityMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
     StateDelegate<SourceScreenState> by DefaultStateDelegate(SourceScreenState.InitialState),
     EventDelegate<SourceScreenEvent> by DefaultEventDelegate(),
@@ -69,6 +73,8 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
         is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
         is SourceScreenEvent.StoreSourceSearch -> storeSourceSearch()
+        is SourceScreenEvent.ShowSnackbar -> showErrorViaSnackbar(event)
+        SourceScreenEvent.DismissSnackbar -> dismissSnackbar()
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) = viewModelScope.iolaunch {
@@ -217,6 +223,17 @@ class SourceScreenViewModel @Inject constructor(
             ?: return@iolaunch internalLogWarn("could not find tag: ${event.tag}")
 
         updateState { copy(searchState = searchState.copy(tags = searchState.tags.minus(tagUiState))) }
+    }
+
+    private fun showErrorViaSnackbar(event: SourceScreenEvent.ShowSnackbar) {
+        val throwableEntity = throwable2ThrowableEntityMapper.map(event.throwable)
+        val message = throwableEntity.description.takeIf { it.isNotBlank() } ?: throwableEntity.title
+
+        updateState { copy(snackbarState = SnackbackState.Content(message = message)) }
+    }
+
+    private fun dismissSnackbar() {
+        updateState { copy(snackbarState = SnackbackState.None) }
     }
 
     private fun pluginSourceNullContentState(): ContentState.Failure {

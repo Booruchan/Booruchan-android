@@ -22,6 +22,7 @@ fun SourceScreen(
     val viewModel = hiltViewModel<SourceScreenViewModel>()
     val screenState by viewModel.stateFlow.collectAsState()
 
+    // navigate to a destination from viewmodel
     viewModel.navigationFlow.collectLatestInComposable { destination ->
         screenLogInfo(Screen.Source, "Navigation destination: $destination")
         when (destination) {
@@ -37,6 +38,4 @@ fun SourceScreen(
     }
 
     SourceScreenUi(screenState = screenState, screenEvent = viewModel::handleEvent)
-
-    screenLogInfo(Screen.Source, "SourceScreen composable")
 }

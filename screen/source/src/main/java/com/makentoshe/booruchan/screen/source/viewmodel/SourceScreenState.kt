@@ -19,6 +19,7 @@ data class SourceScreenState(
     val backdropValue: BackdropValue,
     val contentState: ContentState,
     val searchState: SearchState,
+    val snackbarState: SnackbackState,
 ) {
     companion object {
         val InitialState = SourceScreenState(
@@ -26,6 +27,7 @@ data class SourceScreenState(
             sourceTitle = "",
             backdropValue = BackdropValue.Revealed,
             contentState = ContentState.Loading,
+            snackbarState = SnackbackState.None,
             searchState = SearchState(
                 value = "",
                 label = "Ex: blue_sky cloud 1girl",
@@ -38,12 +40,16 @@ data class SourceScreenState(
 
 @Immutable
 sealed interface ContentState {
+
+    @Immutable
     object Loading : ContentState
 
+    @Immutable
     data class Success(
         val pagerFlow: Flow<PagingData<PreviewPostUiState>>,
     ) : ContentState
 
+    @Immutable
     data class Failure(
         val title: String,
         val description: String,
@@ -67,11 +73,22 @@ data class SearchState(
 
 @Immutable
 sealed interface AutocompleteState {
+
+    @Immutable
     object None : AutocompleteState
 
+    @Immutable
     object Loading : AutocompleteState
 
+    @Immutable
     data class Content(
         val autocomplete: Set<AutocompleteUiState>,
     ) : AutocompleteState
+}
+
+@Immutable
+sealed interface SnackbackState {
+    object None: SnackbackState
+
+    data class Content(val message: String): SnackbackState
 }

@@ -1,4 +1,5 @@
 plugins {
+    id 'kotlin-kapt'
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
 }
@@ -31,9 +32,13 @@ android {
 }
 
 dependencies {
-
     implementation "androidx.core:core-ktx:$android_core_version"
     implementation "androidx.appcompat:appcompat:$android_appcompat_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$android_lifecycle_version"
 
+    // Dagger and Hilt
+    implementation "com.google.dagger:dagger:$dagger_version"
+    implementation "com.google.dagger:hilt-core:$dagger_version"
+    implementation "com.google.dagger:hilt-android:$dagger_version"
+    kapt "com.google.dagger:hilt-android-compiler:$dagger_version"
 }

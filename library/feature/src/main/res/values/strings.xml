@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="throwable_undefined_title">Undefined issue</string>
+    <string name="throwable_unresolved_address_title">Internet issue</string>
+    <string name="throwable_unresolved_address_description">Could not define host address. Check internet connection</string>
+</resources>

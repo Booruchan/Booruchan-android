@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.screen.source.ui
+package com.makentoshe.booruchan.screen.source.ui.topappbar
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

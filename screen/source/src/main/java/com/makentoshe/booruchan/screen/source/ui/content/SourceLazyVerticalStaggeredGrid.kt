@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 
-package com.makentoshe.booruchan.screen.source.ui
+package com.makentoshe.booruchan.screen.source.ui.content
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -23,31 +23,24 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import coil.size.Scale
 import coil.size.Size
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
-import com.makentoshe.booruchan.screen.source.viewmodel.ContentState
-import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
+import com.makentoshe.library.uikit.component.DefaultErrorComponent
 import com.makentoshe.library.uikit.foundation.IndeterminateProgressBar
-import com.makentoshe.library.uikit.foundation.PrimaryTextBold
-import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 private const val SourceLazyVerticalStaggeredGridFooterKey = "SourceStaggeredGridFooterKey"
@@ -55,14 +48,13 @@ private const val SourceLazyVerticalStaggeredGridFooterKey = "SourceStaggeredGri
 @Composable
 internal fun SourceLazyVerticalStaggeredGrid(
     screenState: SourceScreenState,
-    contentState: ContentState.Success,
+    previewPostItems: LazyPagingItems<PreviewPostUiState>,
 ) {
-    val previewPostItems = contentState.pagerFlow.collectAsLazyPagingItems()
-
     val refreshing by remember(key1 = previewPostItems.loadState.refresh) {
         mutableStateOf(previewPostItems.loadState.refresh is LoadState.Loading)
     }
     val pullRefreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = { previewPostItems.refresh() })
+    println("refresh=${previewPostItems.loadState.refresh} append=${previewPostItems.loadState.append}")
 
     Box(
         modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState),
@@ -80,10 +72,21 @@ internal fun SourceLazyVerticalStaggeredGrid(
                 if (item != null) SourcePreviewPostUi(item = item)
             }
 
-            when (previewPostItems.loadState.append) {
-                is LoadState.Loading -> sourceFooterLoading()
-                is LoadState.Error -> sourceFooterError()
-                else -> Unit
+            when (val append = previewPostItems.loadState.append) {
+                is LoadState.Loading -> {
+                    sourceFooterLoading()
+                }
+
+                is LoadState.Error -> {
+                    sourceFooterError(append = append, previewPostItems = previewPostItems)
+                }
+
+                else -> {
+                    val refresh = previewPostItems.loadState.refresh
+                    if (refresh is LoadState.Error) {
+                        sourceFooterError(append = refresh, previewPostItems = previewPostItems)
+                    }
+                }
             }
         }
 
@@ -129,19 +132,14 @@ private fun LazyStaggeredGridScope.sourceFooterLoading() = item(
     )
 }
 
-private fun LazyStaggeredGridScope.sourceFooterError() = item(
+private fun LazyStaggeredGridScope.sourceFooterError(
+    append: LoadState.Error,
+    previewPostItems: LazyPagingItems<PreviewPostUiState>,
+) = item(
     key = SourceLazyVerticalStaggeredGridFooterKey,
     span = StaggeredGridItemSpan.FullLine,
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth().height(128.dp).padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        PrimaryTextBold(text = "Title", textAlign = TextAlign.Start)
-        SecondaryText(text = "Description", textAlign = TextAlign.Center)
-        TextButton(onClick = {}) {
-            PrimaryTextBold(text = "Button")
-        }
+    DefaultErrorComponent(throwable = append.error) {
+        previewPostItems.retry()
     }
 }

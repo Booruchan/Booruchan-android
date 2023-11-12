@@ -38,6 +38,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":library:feature"))
+
     implementation "androidx.core:core-ktx:$android_core_version"
 
     // Android views
