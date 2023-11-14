@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.screen.source.ui.content.SourceScreenContent
-import com.makentoshe.booruchan.screen.source.ui.search.SourceScreenSearch
+import com.makentoshe.booruchan.screen.source.ui.backdrop.SourceScreenBackdrop
 import com.makentoshe.booruchan.screen.source.ui.topappbar.SourceScreenTopbar
 import com.makentoshe.booruchan.screen.source.viewmodel.SnackbackState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
@@ -58,7 +58,7 @@ fun SourceScreenUi(
             SourceScreenTopbar(screenState = screenState, screenEvent = screenEvent)
         },
         frontLayerContent = {
-            SourceScreenSearch(screenState = screenState, screenEvent = screenEvent)
+            SourceScreenBackdrop(screenState = screenState, screenEvent = screenEvent)
         },
         backLayerContent = {
             SourceScreenContent(screenState = screenState, screenEvent = screenEvent)

@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalComposeUiApi::class)
 
-package com.makentoshe.booruchan.screen.source.ui.search
+package com.makentoshe.booruchan.screen.source.ui.backdrop
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,8 +21,7 @@ import com.makentoshe.library.uikit.foundation.SecondaryTextBold
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
-internal fun SourceScreenSearchFooter(
-    screenState: SourceScreenState,
+internal fun SourceScreenBackdropFooter(
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(modifier = Modifier.padding(16.dp)) {
 

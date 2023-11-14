@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalLayoutApi::class, ExperimentalLayoutApi::class)
 
-package com.makentoshe.booruchan.screen.source.ui.component
+package com.makentoshe.booruchan.screen.source.ui.components.chip
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi

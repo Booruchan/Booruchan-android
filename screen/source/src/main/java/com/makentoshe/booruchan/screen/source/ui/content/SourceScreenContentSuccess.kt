@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.makentoshe.booruchan.screen.source.ui.components.grid.StaggeredGrid
 import com.makentoshe.booruchan.screen.source.viewmodel.ContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
@@ -24,7 +25,7 @@ internal fun SourceScreenContentSuccess(
             if (previewPostItems.itemSnapshotList.isEmpty()) {
                 SourceScreenContentLoading()
             } else {
-                SourceLazyVerticalStaggeredGrid(screenState = screenState, previewPostItems = previewPostItems)
+                StaggeredGrid(previewPostItems = previewPostItems)
             }
         }
 
@@ -39,12 +40,12 @@ internal fun SourceScreenContentSuccess(
                 LaunchedEffect(key1 = Unit) {
                     screenEvent(SourceScreenEvent.ShowSnackbar(throwable = refreshState.error))
                 }
-                SourceLazyVerticalStaggeredGrid(screenState = screenState, previewPostItems = previewPostItems)
+                StaggeredGrid(previewPostItems = previewPostItems)
             }
         }
 
         else -> {
-            SourceLazyVerticalStaggeredGrid(screenState = screenState, previewPostItems = previewPostItems)
+            StaggeredGrid(previewPostItems = previewPostItems)
         }
     }
 }

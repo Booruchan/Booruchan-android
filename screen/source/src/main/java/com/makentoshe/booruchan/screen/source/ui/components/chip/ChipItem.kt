@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.screen.source.ui.component
+package com.makentoshe.booruchan.screen.source.ui.components.chip
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
