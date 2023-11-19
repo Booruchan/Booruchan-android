@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.screen.source.ui.backdrop
+package com.makentoshe.booruchan.screen.source.ui.search
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,17 +22,17 @@ import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
-internal fun SourceScreenBackdropContent(
+internal fun SourceScreenSearchContentTags(
     screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(
     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
 ) {
-    SourceScreenBackdropContentGeneral(screenState = screenState, screenEvent = screenEvent)
+    SourceScreenSearchContentTagsGeneral(screenState = screenState, screenEvent = screenEvent)
 }
 
 @Composable
-private fun SourceScreenBackdropContentGeneral(
+private fun SourceScreenSearchContentTagsGeneral(
     screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) {

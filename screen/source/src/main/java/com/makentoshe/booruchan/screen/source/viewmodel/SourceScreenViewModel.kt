@@ -2,7 +2,6 @@
 
 package com.makentoshe.booruchan.screen.source.viewmodel
 
-import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,13 +27,12 @@ import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEnt
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
-import com.makentoshe.booruchan.library.resources.GetStringUseCase
-import com.makentoshe.booruchan.screen.source.R
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -67,12 +65,13 @@ class SourceScreenViewModel @Inject constructor(
     override fun handleEvent(event: SourceScreenEvent) = when (event) {
         is SourceScreenEvent.Initialize -> initialize(event)
         is SourceScreenEvent.NavigationBack -> navigationBack()
-        is SourceScreenEvent.NavigationBackdrop -> navigationBackdrop()
         is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
         is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
         is SourceScreenEvent.StoreSourceSearch -> storeSourceSearch()
+        SourceScreenEvent.ShowSearch -> showSearchViaFullScreen()
+        SourceScreenEvent.DismissSearch -> dismissSearchViaFullScreen()
         is SourceScreenEvent.ShowSnackbar -> showErrorViaSnackbar(event)
         SourceScreenEvent.DismissSnackbar -> dismissSnackbar()
     }
@@ -109,15 +108,6 @@ class SourceScreenViewModel @Inject constructor(
     private fun navigationBack() {
         internalLogInfo("invoke navigation back")
         updateNavigation { SourceScreenDestination.BackDestination }
-    }
-
-    private fun navigationBackdrop() = viewModelScope.iolaunch {
-        internalLogInfo("invoke navigation backdrop: ${state.backdropValue}")
-        val newState = when (state.backdropValue) {
-            BackdropValue.Concealed -> BackdropValue.Revealed
-            BackdropValue.Revealed -> BackdropValue.Concealed
-        }
-        updateState { copy(backdropValue = newState) }
     }
 
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
@@ -190,12 +180,12 @@ class SourceScreenViewModel @Inject constructor(
         setSourceNavigation(sourceSearchNavigation)
     }
 
-    private fun searchApplyFilters() = viewModelScope.iolaunch {
+    private fun searchApplyFilters() = viewModelScope.iolaunch(
+        context = Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+            updateState { copy(contentState = failureContentState(throwable)) }
+        },
+    ) {
         internalLogInfo("invoke apply filters event: ${state.searchState.tags}")
-
-        updateState {
-            copy(contentState = ContentState.Loading, backdropValue = BackdropValue.Revealed)
-        }
 
         // find source from plugin by source id or show failure state
         val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == state.sourceId }
@@ -234,6 +224,19 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun dismissSnackbar() {
         updateState { copy(snackbarState = SnackbackState.None) }
+    }
+
+    private fun showSearchViaFullScreen() {
+        updateState { copy(searchState = searchState.copy(fullScreenState = SearchState.FullScreenState.Expanded)) }
+    }
+
+    private fun dismissSearchViaFullScreen() {
+        updateState { copy(searchState = searchState.copy(fullScreenState = SearchState.FullScreenState.Collapsed)) }
+    }
+
+    private fun failureContentState(throwable: Throwable): ContentState.Failure {
+        val throwableEntity = throwable2ThrowableEntityMapper.map(throwable)
+        return ContentState.Failure(title = throwableEntity.title, description = throwableEntity.description)
     }
 
     private fun pluginSourceNullContentState(): ContentState.Failure {

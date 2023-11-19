@@ -10,13 +10,11 @@ import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import javax.annotation.concurrent.Immutable
 
 data class SourceScreenState(
     val sourceId: String,
     val sourceTitle: String,
-    val backdropValue: BackdropValue,
     val contentState: ContentState,
     val searchState: SearchState,
     val snackbarState: SnackbackState,
@@ -25,7 +23,6 @@ data class SourceScreenState(
         val InitialState = SourceScreenState(
             sourceId = "",
             sourceTitle = "",
-            backdropValue = BackdropValue.Revealed,
             contentState = ContentState.Loading,
             snackbarState = SnackbackState.None,
             searchState = SearchState(
@@ -33,6 +30,7 @@ data class SourceScreenState(
                 label = "Ex: blue_sky cloud 1girl",
                 tags = emptySet(),
                 autocompleteState = AutocompleteState.None,
+                fullScreenState = SearchState.FullScreenState.Collapsed
             ),
         )
     }
@@ -66,9 +64,16 @@ data class SearchState(
     val tags: Set<TagUiState>,
     /** Autocompletion state */
     val autocompleteState: AutocompleteState,
+    /** full screen search view state */
+    val fullScreenState: FullScreenState,
 ) {
     val generalTags: List<TagUiState>
         get() = tags.filter { it.type == TagType.General }
+
+    sealed interface FullScreenState {
+        object Expanded: FullScreenState
+        object Collapsed: FullScreenState
+    }
 }
 
 @Immutable

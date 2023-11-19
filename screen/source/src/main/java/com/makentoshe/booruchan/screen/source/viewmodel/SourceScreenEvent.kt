@@ -7,14 +7,17 @@ sealed interface SourceScreenEvent {
     /** Navigates back from the current screen */
     object NavigationBack : SourceScreenEvent
 
-    /** Opens/closes backdrop side */
-    object NavigationBackdrop : SourceScreenEvent
-
     /** Shows error using snackbar */
     data class ShowSnackbar(val throwable: Throwable): SourceScreenEvent
 
     /** Dismiss any snackbar */
     object DismissSnackbar: SourceScreenEvent
+
+    /** Shows a simple search view above the content */
+    object ShowSearch: SourceScreenEvent
+
+    /** Dismiss search view above the content */
+    object DismissSearch: SourceScreenEvent
 
     /** Stores current search in navigation storage. We can return to this screen state lately */
     object StoreSourceSearch : SourceScreenEvent

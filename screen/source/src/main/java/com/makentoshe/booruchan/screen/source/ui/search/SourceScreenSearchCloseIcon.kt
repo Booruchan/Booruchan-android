@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.screen.source.ui.components.textfield
+package com.makentoshe.booruchan.screen.source.ui.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,17 +15,20 @@ import com.makentoshe.library.uikit.foundation.CloseIcon
 import com.makentoshe.library.uikit.foundation.IndeterminateProgressBar
 
 @Composable
-internal fun SearchTextFieldSuffix(
+internal fun SourceScreenSearchCloseIcon(
     screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
-) = Box(modifier = Modifier.size(36.dp), contentAlignment = Alignment.Center) {
+) = Box(
+    modifier = Modifier.size(48.dp).clickable {
+        screenEvent(SourceScreenEvent.SearchValueChange(value = ""))
+    },
+    contentAlignment = Alignment.Center,
+) {
     if (screenState.searchState.autocompleteState is AutocompleteState.Loading) {
-        IndeterminateProgressBar(modifier = Modifier.padding(4.dp), strokeWidth = 3.dp)
+        IndeterminateProgressBar(modifier = Modifier.size(36.dp).padding(4.dp), strokeWidth = 3.dp)
     }
 
     if (screenState.searchState.value.isNotEmpty()) {
-        CloseIcon(modifier = Modifier.clickable {
-            screenEvent(SourceScreenEvent.SearchValueChange(value = ""))
-        })
+        CloseIcon()
     }
 }
