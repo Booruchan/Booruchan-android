@@ -43,10 +43,10 @@ class PostPagingSource @Inject constructor(
 
     private suspend fun internalLoad(params: LoadParams<Int>): LoadResult<Int, PreviewPostUiState> {
         // Start refresh at page 1 if undefined.
-        val nextPageNumber = params.key ?: fetchPostsFactory.initialPageNumber
+        val currentKey = params.key ?: fetchPostsFactory.initialPageNumber
         val postsPerPage = params.loadSize
 
-        val fetchPostsRequest = FetchPostsFactory.FetchPostsRequest(postsPerPage, nextPageNumber, query)
+        val fetchPostsRequest = FetchPostsFactory.FetchPostsRequest(postsPerPage, currentKey, query)
         val fetchPostsResponse = fetchPosts(fetchPostsFactory, fetchPostsRequest)
 
         // store posts in the database
@@ -54,11 +54,14 @@ class PostPagingSource @Inject constructor(
             launch { setPosts(source = source, posts = fetchPostsResponse)  }
         }
 
+        val nextKey = if(fetchPostsResponse.count() < postsPerPage) null else currentKey + 1
+        val prevKey = null// Only paging forward.
+
         // publish the response
         return LoadResult.Page(
             data = fetchPostsResponse.map(mapper::map),
-            prevKey = null, // Only paging forward.
-            nextKey = nextPageNumber + 1
+            prevKey = prevKey,
+            nextKey = nextKey
         )
     }
 }
