@@ -58,6 +58,12 @@ internal fun StaggeredGrid(
 
                 else -> {
                     val refresh = previewPostItems.loadState.refresh
+                    val append = previewPostItems.loadState.append
+
+                    if (append.endOfPaginationReached) {
+                        staggeredGridFinished()
+                    }
+
                     if (refresh is LoadState.Error) {
                         staggeredGridFooterError(append = refresh, previewPostItems = previewPostItems)
                     }

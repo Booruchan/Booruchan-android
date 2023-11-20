@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="source_content_retry_button">Retry</string>
+    <string name="source_content_finished_text">This is the end of the content</string>
     <string name="source_content_snackbar_message_separator">%1$s. %2$s</string>
 </resources>
