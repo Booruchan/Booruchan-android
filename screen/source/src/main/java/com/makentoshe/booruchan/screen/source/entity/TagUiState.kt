@@ -2,7 +2,7 @@ package com.makentoshe.booruchan.screen.source.entity
 
 
 enum class TagType {
-    General, Artist, Character, Copyright, Metadata
+    General, Artist, Character, Copyright, Metadata, Other
 }
 
 data class TagUiState(val tag: String, val type: TagType) {

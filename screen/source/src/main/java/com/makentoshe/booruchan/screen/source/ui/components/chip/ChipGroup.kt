@@ -18,6 +18,6 @@ internal fun ChipGroup(
 ) = FlowRow(
     modifier = modifier,
     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
-    verticalAlignment = Alignment.Top,
+    verticalArrangement = Arrangement.Top,
     content = content,
 )

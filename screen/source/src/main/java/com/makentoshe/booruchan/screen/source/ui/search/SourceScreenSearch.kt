@@ -4,7 +4,7 @@ package com.makentoshe.booruchan.screen.source.ui.search
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
@@ -12,7 +12,7 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntSize
 import com.makentoshe.booruchan.screen.source.viewmodel.SearchState
@@ -38,11 +38,11 @@ internal fun SourceScreenSearch(
     }
 )
 
-private fun AnimatedContentScope<SearchState.FullScreenState>.sourceScreenSearchTransition(): ContentTransform {
-    return sourceScreenSearchFadeIn() with sourceScreenSearchFadeOut() using sourceScreenSearchSizeTransform()
+private fun AnimatedContentTransitionScope<SearchState.FullScreenState>.sourceScreenSearchTransition(): ContentTransform {
+    return sourceScreenSearchFadeIn() togetherWith sourceScreenSearchFadeOut() using sourceScreenSearchSizeTransform()
 }
 
-private fun AnimatedContentScope<SearchState.FullScreenState>.sourceScreenSearchSizeTransform(): SizeTransform {
+private fun AnimatedContentTransitionScope<SearchState.FullScreenState>.sourceScreenSearchSizeTransform(): SizeTransform {
     return SizeTransform { initialSize, targetSize ->
         if (targetState is SearchState.FullScreenState.Expanded) {
             keyframes {

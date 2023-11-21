@@ -9,6 +9,7 @@
     <string name="home_source_ok">%s</string>
 
 
+    <string name="source_search_tag_rating">Rating</string>
     <string name="source_search_tags_general">General</string>
 
     <string name="source_search_apply_filters_button">Apply filters</string>
