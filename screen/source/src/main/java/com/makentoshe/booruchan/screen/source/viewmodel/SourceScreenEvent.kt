@@ -22,7 +22,10 @@ sealed interface SourceScreenEvent {
     /** Stores current search in navigation storage. We can return to this screen state lately */
     object StoreSourceSearch : SourceScreenEvent
 
+    /** Invokes on each symbol input from the keyboard */
     data class SearchValueChange(val value: String): SourceScreenEvent
+
+    data class SuggestedItemClicked(val value: String): SourceScreenEvent
 
     data class SearchTagAdd(val tag: String): SourceScreenEvent
 

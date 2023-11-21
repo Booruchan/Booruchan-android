@@ -10,6 +10,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
+import com.makentoshe.booruchan.extension.base.settings.SourceSearchSettings
 import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.feature.entity.SearchSnapshot
 import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase
@@ -74,6 +75,7 @@ class SourceScreenViewModel @Inject constructor(
         SourceScreenEvent.DismissSearch -> dismissSearchViaFullScreen()
         is SourceScreenEvent.ShowSnackbar -> showErrorViaSnackbar(event)
         SourceScreenEvent.DismissSnackbar -> dismissSnackbar()
+        is SourceScreenEvent.SuggestedItemClicked -> suggestedItemClicked(event)
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) = viewModelScope.iolaunch {
@@ -114,7 +116,9 @@ class SourceScreenViewModel @Inject constructor(
         internalLogInfo("invoke search value change: ${event.value} ${autocompleteJob?.isActive}")
 
         val searchValueLastCharacter = event.value.lastOrNull()?.toString()
-        if (searchValueLastCharacter != null && searchValueLastCharacter == source.settings.searchSettings.searchTagAnd) {
+        val searchTags = source.settings.searchSettings.searchTags
+
+        if (searchValueLastCharacter != null && searchTags.contains(searchValueLastCharacter) && event.value.count() > 2) {
             handleEvent(SourceScreenEvent.SearchTagAdd(event.value))
             return updateState {
                 copy(searchState = searchState.copy(value = "", autocompleteState = AutocompleteState.None))
@@ -156,6 +160,18 @@ class SourceScreenViewModel @Inject constructor(
         internalLogInfo("autocomplete search success: $autocompletes")
         updateState {
             copy(searchState = searchState.copy(autocompleteState = AutocompleteState.Content(autocompleteUiStates)))
+        }
+    }
+
+    private fun suggestedItemClicked(event: SourceScreenEvent.SuggestedItemClicked) {
+        internalLogInfo("invoke suggested item clicked: $event")
+
+        // Add tag from the suggestion list and apply login search operator if presented
+        val searchValueFirstCharacter = state.searchState.value.firstOrNull()?.toString()
+        if (source.settings.searchSettings.searchTags.contains(searchValueFirstCharacter)) {
+            searchAddTag(SourceScreenEvent.SearchTagAdd("$searchValueFirstCharacter${event.value}"))
+        } else {
+            searchAddTag(SourceScreenEvent.SearchTagAdd(event.value))
         }
     }
 
@@ -260,4 +276,7 @@ class SourceScreenViewModel @Inject constructor(
             description = "Could not determine FetchPostFactory for this Source"
         )
     }
+
+    private val SourceSearchSettings.searchTags: List<String>
+        get() = listOf(searchTagAnd, searchTagOr, searchTagNot)
 }
