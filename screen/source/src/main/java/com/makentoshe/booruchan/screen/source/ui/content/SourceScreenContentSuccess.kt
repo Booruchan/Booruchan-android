@@ -25,7 +25,7 @@ internal fun SourceScreenContentSuccess(
             if (previewPostItems.itemSnapshotList.isEmpty()) {
                 SourceScreenContentLoading()
             } else {
-                StaggeredGrid(previewPostItems = previewPostItems)
+                StaggeredGrid(previewPostItems = previewPostItems, screenEvent = screenEvent)
             }
         }
 
@@ -40,12 +40,12 @@ internal fun SourceScreenContentSuccess(
                 LaunchedEffect(key1 = Unit) {
                     screenEvent(SourceScreenEvent.ShowSnackbar(throwable = refreshState.error))
                 }
-                StaggeredGrid(previewPostItems = previewPostItems)
+                StaggeredGrid(previewPostItems = previewPostItems, screenEvent = screenEvent)
             }
         }
 
         else -> {
-            StaggeredGrid(previewPostItems = previewPostItems)
+            StaggeredGrid(previewPostItems = previewPostItems, screenEvent = screenEvent)
         }
     }
 }

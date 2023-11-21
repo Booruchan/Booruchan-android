@@ -24,10 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 
 @Composable
 internal fun StaggeredGrid(
     previewPostItems: LazyPagingItems<PreviewPostUiState>,
+    screenEvent: (SourceScreenEvent) -> Unit,
 ) {
     val refreshing by remember(key1 = previewPostItems.loadState.refresh) {
         mutableStateOf(previewPostItems.loadState.refresh is LoadState.Loading)
@@ -45,7 +47,7 @@ internal fun StaggeredGrid(
             verticalItemSpacing = 8.dp,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            staggeredGridItems(items = previewPostItems)
+            staggeredGridItems(items = previewPostItems, screenEvent = screenEvent)
 
             when (val append = previewPostItems.loadState.append) {
                 is LoadState.Loading -> {

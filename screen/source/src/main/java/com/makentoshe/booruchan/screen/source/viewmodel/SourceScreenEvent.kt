@@ -7,6 +7,9 @@ sealed interface SourceScreenEvent {
     /** Navigates back from the current screen */
     object NavigationBack : SourceScreenEvent
 
+    /** Navigates forward to the fullscreen image screen */
+    data class NavigationImage(val id: String): SourceScreenEvent
+
     /** Shows error using snackbar */
     data class ShowSnackbar(val throwable: Throwable): SourceScreenEvent
 

@@ -29,6 +29,10 @@ fun SourceScreen(
             SourceScreenDestination.BackDestination -> {
                 navigator.back()
             }
+
+            is SourceScreenDestination.ImageDestination -> {
+                println("Navigate to Image screen: $destination")
+            }
         }
     }
 

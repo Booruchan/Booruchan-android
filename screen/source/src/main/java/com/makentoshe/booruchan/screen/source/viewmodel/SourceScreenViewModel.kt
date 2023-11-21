@@ -66,6 +66,7 @@ class SourceScreenViewModel @Inject constructor(
     override fun handleEvent(event: SourceScreenEvent) = when (event) {
         is SourceScreenEvent.Initialize -> initialize(event)
         is SourceScreenEvent.NavigationBack -> navigationBack()
+        is SourceScreenEvent.NavigationImage -> navigationImage(event)
         is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
@@ -110,6 +111,11 @@ class SourceScreenViewModel @Inject constructor(
     private fun navigationBack() {
         internalLogInfo("invoke navigation back")
         updateNavigation { SourceScreenDestination.BackDestination }
+    }
+
+    private fun navigationImage(event: SourceScreenEvent.NavigationImage) {
+        internalLogInfo("invoke navigation image for Source(${source.id}) with Post(${event.id})")
+        updateNavigation { SourceScreenDestination.ImageDestination(postId = event.id, sourceId = source.id) }
     }
 
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
