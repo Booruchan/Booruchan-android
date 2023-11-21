@@ -4,6 +4,7 @@ import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
 import com.makentoshe.booruchan.extension.base.factory.FetchPostsFactory
 import com.makentoshe.booruchan.extension.base.factory.HealthCheckFactory
+import com.makentoshe.booruchan.extension.base.settings.SourceSettings
 
 class SourceWrapper(private val source: Source) : Source {
     override val host: String
@@ -11,6 +12,8 @@ class SourceWrapper(private val source: Source) : Source {
 
     override val id: String
         get() = source.id
+    override val settings: SourceSettings
+        get() = source.settings
 
     override val title: String
         get() = source.title
