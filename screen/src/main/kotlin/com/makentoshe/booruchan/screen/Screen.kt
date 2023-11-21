@@ -30,4 +30,17 @@ sealed interface Screen {
 
         fun route(sourceId: String) = "SourceScreen/$sourceId"
     }
+
+    object Image: Screen {
+        private val sourceIdArgumentName = "SourceId"
+        val sourceIdArgument = navArgument(sourceIdArgumentName) {
+            type = NavType.StringType
+        }
+
+        override val arguments: List<NamedNavArgument> = listOf(sourceIdArgument)
+
+        override val route: String = "ImageScreen/{$sourceIdArgumentName}"
+
+        fun route(sourceId: String) = "ImageScreen/$sourceId"
+    }
 }
