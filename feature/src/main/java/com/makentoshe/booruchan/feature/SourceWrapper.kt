@@ -12,6 +12,7 @@ class SourceWrapper(private val source: Source) : Source {
 
     override val id: String
         get() = source.id
+
     override val settings: SourceSettings
         get() = source.settings
 

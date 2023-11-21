@@ -45,7 +45,6 @@ private fun SourceScreenSearchSuggestionsContent(
             },
             onClick = {
                 screenEvent(SourceScreenEvent.SearchTagAdd(autocompleteUiState.value))
-                screenEvent(SourceScreenEvent.SearchTagAdd(""))
             },
         )
     }

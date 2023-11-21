@@ -113,6 +113,14 @@ class SourceScreenViewModel @Inject constructor(
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
         internalLogInfo("invoke search value change: ${event.value} ${autocompleteJob?.isActive}")
 
+        val searchValueLastCharacter = event.value.lastOrNull()?.toString()
+        if (searchValueLastCharacter != null && searchValueLastCharacter == source.settings.searchSettings.searchTagAnd) {
+            handleEvent(SourceScreenEvent.SearchTagAdd(event.value))
+            return updateState {
+                copy(searchState = searchState.copy(value = "", autocompleteState = AutocompleteState.None))
+            }
+        }
+
         updateState {
             copy(searchState = searchState.copy(value = event.value, autocompleteState = AutocompleteState.None))
         }
