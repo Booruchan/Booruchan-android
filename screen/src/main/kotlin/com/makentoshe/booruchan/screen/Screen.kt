@@ -3,6 +3,7 @@ package com.makentoshe.booruchan.screen
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.makentoshe.booruchan.screen.Screen.Source.sourceIdArgumentName
 
 sealed interface Screen {
     val route: String
@@ -37,10 +38,15 @@ sealed interface Screen {
             type = NavType.StringType
         }
 
-        override val arguments: List<NamedNavArgument> = listOf(sourceIdArgument)
+        private val postIdArgumentName = "PostId"
+        val postIdArgument = navArgument(postIdArgumentName) {
+            type = NavType.StringType
+        }
 
-        override val route: String = "ImageScreen/{$sourceIdArgumentName}"
+        override val arguments: List<NamedNavArgument> = listOf(sourceIdArgument, postIdArgument)
 
-        fun route(sourceId: String) = "ImageScreen/$sourceId"
+        override val route: String = "ImageScreen/{$sourceIdArgumentName}/{$postIdArgumentName}"
+
+        fun route(sourceId: String, postId: String) = "ImageScreen/$sourceId/$postId"
     }
 }

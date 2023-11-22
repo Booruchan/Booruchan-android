@@ -7,9 +7,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.makentoshe.booruchan.library.navigation.HomeScreenNavigator
+import com.makentoshe.booruchan.library.navigation.ImageScreenNavigator
 import com.makentoshe.booruchan.library.navigation.SourceScreenNavigator
 import com.makentoshe.booruchan.library.navigation.SplashScreenNavigator
 import com.makentoshe.booruchan.screen.Screen
+import com.makentoshe.booruchan.screen.image.ImageScreen
 import com.makentoshe.booruchan.screen.source.SourceScreen
 import com.makentoshe.booruchan.screen.splash.SplashScreen
 import com.makentoshe.screen.boorulist.HomeScreen
@@ -22,6 +24,7 @@ internal fun MainActivityNavigationContent(navHostController: NavHostController)
         splashScreen(navController = navHostController)
         homeScreen(navController = navHostController)
         sourceScreen(navController = navHostController)
+        imageScreen(navController = navHostController)
     }
 )
 
@@ -52,11 +55,27 @@ private fun NavGraphBuilder.homeScreen(navController: NavController) {
 private fun NavGraphBuilder.sourceScreen(navController: NavController) {
     val navigator = SourceScreenNavigator(
         back = { navController.popBackStack() },
+        navigateToImageScreen = { sourceId, postId ->
+            navController.navigate(Screen.Image.route(sourceId, postId))
+        }
     )
 
     val screen = Screen.Source
     composable(route = screen.route, arguments = screen.arguments) { entry ->
         val sourceId = entry.arguments?.getString(screen.sourceIdArgument.name)!!
         SourceScreen(navigator = navigator, sourceId = sourceId)
+    }
+}
+
+private fun NavGraphBuilder.imageScreen(navController: NavController) {
+    val navigator = ImageScreenNavigator(
+        back = { navController.popBackStack() }
+    )
+
+    val screen = Screen.Image
+    composable(route = screen.route, arguments = screen.arguments) { entry ->
+        val sourceId = entry.arguments?.getString(screen.sourceIdArgument.name)!!
+        val postId = entry.arguments?.getString(screen.postIdArgument.name)!!
+        ImageScreen(sourceId = sourceId, postId = postId)//(navigator = navigator, sourceId = sourceId)
     }
 }

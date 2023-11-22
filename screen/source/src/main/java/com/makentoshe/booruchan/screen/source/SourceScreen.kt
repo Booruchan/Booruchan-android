@@ -31,7 +31,7 @@ fun SourceScreen(
             }
 
             is SourceScreenDestination.ImageDestination -> {
-                println("Navigate to Image screen: $destination")
+                navigator.navigateToImageScreen(destination.sourceId, destination.postId)
             }
         }
     }
