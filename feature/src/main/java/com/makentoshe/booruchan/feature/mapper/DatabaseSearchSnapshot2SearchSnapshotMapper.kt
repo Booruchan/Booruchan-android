@@ -1,12 +1,13 @@
 package com.makentoshe.booruchan.feature.mapper
 
-import com.makentoshe.booruchan.feature.entity.SearchSnapshot
-import com.makentoshe.booruchan.library.database.entity.DatabaseSearchSnapshot
+import com.makentoshe.booruchan.feature.entity.ActionSearchHistory
+import com.makentoshe.booruchan.library.database.entity.DatabaseActionSearchHistory
 import javax.inject.Inject
 
-class DatabaseSearchSnapshot2SearchSnapshotMapper @Inject constructor() {
-    fun map(searchSnapshot: DatabaseSearchSnapshot) = SearchSnapshot(
+class DatabaseActionSearchHistory2SearchSnapshotMapper @Inject constructor() {
+    fun map(searchSnapshot: DatabaseActionSearchHistory) = ActionSearchHistory(
         source = searchSnapshot.source,
-        tags = searchSnapshot.tags,
+        search = searchSnapshot.search,
+        timestamp = searchSnapshot.timestamp,
     )
 }

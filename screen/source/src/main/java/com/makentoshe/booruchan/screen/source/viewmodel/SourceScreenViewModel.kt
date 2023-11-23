@@ -12,10 +12,10 @@ import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
 import com.makentoshe.booruchan.extension.base.settings.SourceSearchSettings
 import com.makentoshe.booruchan.feature.PluginFactory
-import com.makentoshe.booruchan.feature.entity.SearchSnapshot
+import com.makentoshe.booruchan.feature.entity.ActionSearchHistory
 import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase
 import com.makentoshe.booruchan.feature.usecase.SetAutocompleteSearchUseCase
-import com.makentoshe.booruchan.feature.usecase.SetSearchSnapshotUseCase
+import com.makentoshe.booruchan.feature.usecase.SetActionSearchHistoryUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -46,7 +46,7 @@ class SourceScreenViewModel @Inject constructor(
     private val findAllPlugins: GetAllPluginsUseCase,
     private val fetchAutocompleteSearch: FetchAutocompleteSearchUseCase,
     private val setAutocompleteSearch: SetAutocompleteSearchUseCase,
-    private val setSourceNavigation: SetSearchSnapshotUseCase,
+    private val setActionSearchHistory: SetActionSearchHistoryUseCase,
     private val pagingSourceFactory: PagingSourceFactory,
     private val autocompleteUiStateMapper: Autocomplete2AutocompleteUiStateMapper,
     private val throwable2ThrowableEntityMapper: Throwable2ThrowableEntityMapper,
@@ -106,6 +106,8 @@ class SourceScreenViewModel @Inject constructor(
         updateState {
             copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
         }
+
+        storeSourceSearch()
     }
 
     private fun navigationBack() {
@@ -206,8 +208,8 @@ class SourceScreenViewModel @Inject constructor(
         val fetchPostsFactory = source.fetchPostsFactory ?: return@iolaunch
 
         val tags = state.searchState.tags.joinToString(separator = fetchPostsFactory.searchTagSeparator) { it.tag }
-        val sourceSearchNavigation = SearchSnapshot(source = source.id, tags = tags)
-        setSourceNavigation(sourceSearchNavigation)
+        val sourceSearchNavigation = ActionSearchHistory(source = source.id, search = tags)
+        setActionSearchHistory(sourceSearchNavigation)
     }
 
     private fun searchApplyFilters() = viewModelScope.iolaunch(
@@ -234,6 +236,8 @@ class SourceScreenViewModel @Inject constructor(
         updateState {
             copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
         }
+
+        storeSourceSearch()
     }
 
     private fun searchRemoveTag(event: SourceScreenEvent.SearchTagRemove) = viewModelScope.iolaunch {

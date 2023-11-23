@@ -3,7 +3,7 @@ package com.makentoshe.booruchan.library.database.di
 import android.content.Context
 import androidx.room.Room
 import com.makentoshe.booruchan.library.database.ApplicationDatabase
-import com.makentoshe.booruchan.library.database.SearchSnapshotDatabase
+import com.makentoshe.booruchan.library.database.HistoryDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,7 +17,7 @@ abstract class DatabaseModule {
     companion object {
 
         private const val ApplicationDatabaseName = "ApplicationDatabase"
-        private const val NavigationDatabaseName = "NavigationDatabase"
+        private const val HistoryDatabaseName = "NavigationDatabase"
 
         @Singleton
         @Provides
@@ -35,8 +35,8 @@ abstract class DatabaseModule {
             @ApplicationContext applicationContext: Context,
         ) = Room.databaseBuilder(
             /* context = */ applicationContext,
-            /* klass = */ SearchSnapshotDatabase::class.java,
-            /* name = */ NavigationDatabaseName,
+            /* klass = */ HistoryDatabase::class.java,
+            /* name = */ HistoryDatabaseName,
         ).fallbackToDestructiveMigration().build()
     }
 }

@@ -14,11 +14,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostPagingSource @Inject constructor(
+    private val source: Source,
     /** Fetching posts from network */
     private val fetchPosts: FetchPostsUseCase,
     /** Set posts to local storage */
     private val setPosts: SetPostsUseCase,
-    private val source: Source,
     private val fetchPostsFactory: FetchPostsFactory,
     private val mapper: Post2PreviewPostUiStateMapper,
     private val query: String,

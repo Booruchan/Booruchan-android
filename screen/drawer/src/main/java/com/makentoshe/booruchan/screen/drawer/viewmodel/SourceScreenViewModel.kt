@@ -2,7 +2,6 @@ package com.makentoshe.booruchan.screen.drawer.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.makentoshe.booruchan.feature.usecase.FlowSearchSnapshotUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -17,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DrawerScreenViewModel @Inject constructor(
-    private val flowSearchSnapshotUseCase: FlowSearchSnapshotUseCase,
+//    private val flowSearchSnapshotUseCase: FlowSearchSnapshotUseCase,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
     StateDelegate<DrawerScreenState> by DefaultStateDelegate(DrawerScreenState.InitialState),
     EventDelegate<DrawerScreenEvent> by DefaultEventDelegate(),
@@ -25,9 +24,9 @@ class DrawerScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.iolaunch {
-            flowSearchSnapshotUseCase().collectLatest { snapshots ->
-                updateState { copy(snapshots = snapshots) }
-            }
+//            flowSearchSnapshotUseCase().collectLatest { snapshots ->
+//                updateState { copy(snapshots = snapshots) }
+//            }
         }
     }
 
