@@ -12,6 +12,9 @@ interface DatabaseTagPostCrossRefDao {
     @Query("SELECT * FROM DatabaseTagPostCrossRef")
     fun getAll(): List<DatabaseTagPostCrossRef>
 
+    @Query("SELECT * FROM DatabaseTagPostCrossRef WHERE source=:source AND id=:id")
+    fun getBySourceAndPostId(source: String, id: String): List<DatabaseTagPostCrossRef>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(tag: DatabaseTagPostCrossRef)
 

@@ -12,6 +12,9 @@ interface DatabaseTagDao {
     @Query("SELECT * FROM DatabaseTag")
     fun getAll(): List<DatabaseTag>
 
+    @Query("SELECT * FROM DatabaseTag WHERE source=:source AND value=:value")
+    fun getBySourceAndTagValue(source: String, value: String): List<DatabaseTag>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(tag: DatabaseTag)
 

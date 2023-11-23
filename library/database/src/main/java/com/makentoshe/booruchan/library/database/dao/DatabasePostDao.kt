@@ -12,6 +12,9 @@ interface DatabasePostDao {
     @Query("SELECT * FROM DatabasePost")
     fun getAll(): List<DatabasePost>
 
+    @Query("SELECT * FROM DatabasePost WHERE id=:id AND source=:source")
+    fun getBySourceAndId(source: String, id: String): DatabasePost?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(tag: DatabasePost)
 

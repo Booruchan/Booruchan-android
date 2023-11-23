@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.feature.EmptySource
 import com.makentoshe.booruchan.feature.PluginFactory
+import com.makentoshe.booruchan.feature.usecase.GetPostByIdUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -16,6 +17,7 @@ import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -25,6 +27,8 @@ import javax.inject.Inject
 class ImageScreenViewModel @Inject constructor(
     private val pluginFactory: PluginFactory,
     private val findAllPlugins: GetAllPluginsUseCase,
+
+    private val getPost: GetPostByIdUseCase,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
     StateDelegate<ImageScreenState> by DefaultStateDelegate(ImageScreenState.InitialState),
     EventDelegate<ImageScreenEvent> by DefaultEventDelegate(),
@@ -44,17 +48,19 @@ class ImageScreenViewModel @Inject constructor(
 
     private fun initialize(event: ImageScreenEvent.Initialize) = viewModelScope.iolaunch {
         internalLogInfo("invoke initialize for Source(${event.sourceId})")
-
+        // store arguments in the state
+        updateState { copy(sourceId = event.sourceId, postId = event.postId) }
         // find source from plugin by source id or show failure state
         val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == event.sourceId }
             ?: return@iolaunch //updateState { copy(contentState = pluginSourceNullContentState()) }
-
+        // invoke on source change sub-flow
         sourceFlow.emit(source)
     }
 
-    private fun onSource(source: Source) {
-        if (source is EmptySource) return
+    private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
+        // Ignore empty source which is applied on initial
+        if (source is EmptySource) return@launch
 
-        println(source)
+        println(getPost(source.id, state.postId))
     }
 }
