@@ -21,6 +21,6 @@ internal fun ImageScreenContentFailure(
         title = contentState.title,
         description = contentState.description,
         button = contentState.button,
-        onClick = { screenEvent(contentState.event) },
+        onClick = { contentState.event?.let { screenEvent(it) } },
     )
 }

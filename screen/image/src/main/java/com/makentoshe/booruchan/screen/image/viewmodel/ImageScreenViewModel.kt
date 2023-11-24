@@ -46,7 +46,7 @@ class ImageScreenViewModel @Inject constructor(
 
     override fun handleEvent(event: ImageScreenEvent) = when (event) {
         is ImageScreenEvent.Initialize -> initialize(event)
-        ImageScreenEvent.Retry -> {  }
+        ImageScreenEvent.Retry -> retry()
     }
 
     private fun initialize(event: ImageScreenEvent.Initialize) = viewModelScope.iolaunch {
@@ -55,7 +55,7 @@ class ImageScreenViewModel @Inject constructor(
         updateState { copy(sourceId = event.sourceId, postId = event.postId) }
         // find source from plugin by source id or show failure state
         val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == event.sourceId }
-            ?: return@iolaunch //updateState { copy(contentState = pluginSourceNullContentState()) }
+            ?: return@iolaunch updateState { copy(contentState = pluginSourceNullContentState()) }
         // invoke on source change sub-flow
         sourceFlow.emit(source)
     }
@@ -63,9 +63,14 @@ class ImageScreenViewModel @Inject constructor(
     private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
         if (source is EmptySource) return@launch
+        // Request post content
+        requestSamplePostContent(state.sourceId, state.postId)
+    }
+
+    private suspend fun requestSamplePostContent(sourceId: String, postId: String) {
         // Receive post by its id
-        val post = getPost(source.id, state.postId)
-            ?: return@launch updateState { copy(contentState = sas()) }
+        val post = getPost(sourceId, postId)
+            ?: return updateState { copy(contentState = sas()) }
         // Map post to ui state
         val samplePostUiState = post2SamplePostUiStateMapper.map(post)
 
@@ -74,10 +79,24 @@ class ImageScreenViewModel @Inject constructor(
         }
     }
 
+    private fun retry() = viewModelScope.iolaunch {
+        updateState { copy(contentState = ContentState.Loading) }
+        // Request post content again
+        requestSamplePostContent(state.sourceId, state.postId)
+    }
+
     private fun sas() = ContentState.Failure(
         title = "Could not retrieve post",
         description = "",
         button = "Retry",
         event = ImageScreenEvent.Retry,
     )
+
+    private fun pluginSourceNullContentState() = ContentState.Failure(
+        title = "There is a plugin error",
+        description = "Could not determine Source for this plugin",
+        button = null,
+        event = null,
+    )
+
 }
