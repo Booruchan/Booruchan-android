@@ -10,5 +10,5 @@ fun ImageScreenUi(
     screenState: ImageScreenState,
     screenEvent: (ImageScreenEvent) -> Unit,
 ) {
-    Text(text = "$screenState")
+    Text(text = "${screenState.contentState}")
 }

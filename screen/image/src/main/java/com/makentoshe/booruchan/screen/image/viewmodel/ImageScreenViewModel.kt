@@ -16,6 +16,7 @@ import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
+import com.makentoshe.booruchan.screen.image.mapper.Post2SamplePostUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ class ImageScreenViewModel @Inject constructor(
     private val findAllPlugins: GetAllPluginsUseCase,
 
     private val getPost: GetPostByIdUseCase,
+    private val post2SamplePostUiStateMapper: Post2SamplePostUiStateMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
     StateDelegate<ImageScreenState> by DefaultStateDelegate(ImageScreenState.InitialState),
     EventDelegate<ImageScreenEvent> by DefaultEventDelegate(),
@@ -60,7 +62,14 @@ class ImageScreenViewModel @Inject constructor(
     private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
         if (source is EmptySource) return@launch
+        // Receive post by its id
+        val post = getPost(source.id, state.postId)
+            ?: return@launch updateState { copy(contentState = ContentState.Failure("Failure message")) }
+        // Map post to ui state
+        val samplePostUiState = post2SamplePostUiStateMapper.map(post)
 
-        println(getPost(source.id, state.postId))
+        updateState {
+            copy(contentState = ContentState.Content(samplePostUiState))
+        }
     }
 }
