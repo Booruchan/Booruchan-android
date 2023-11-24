@@ -24,7 +24,10 @@ sealed interface ContentState {
 
     @Immutable
     data class Failure(
-        val message: String,
+        val title: String,
+        val description: String,
+        val button: String,
+        val event: ImageScreenEvent,
     ): ContentState
 
     @Immutable

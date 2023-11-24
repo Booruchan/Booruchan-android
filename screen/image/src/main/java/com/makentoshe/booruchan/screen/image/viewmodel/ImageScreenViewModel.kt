@@ -46,6 +46,7 @@ class ImageScreenViewModel @Inject constructor(
 
     override fun handleEvent(event: ImageScreenEvent) = when (event) {
         is ImageScreenEvent.Initialize -> initialize(event)
+        ImageScreenEvent.Retry -> {  }
     }
 
     private fun initialize(event: ImageScreenEvent.Initialize) = viewModelScope.iolaunch {
@@ -64,7 +65,7 @@ class ImageScreenViewModel @Inject constructor(
         if (source is EmptySource) return@launch
         // Receive post by its id
         val post = getPost(source.id, state.postId)
-            ?: return@launch updateState { copy(contentState = ContentState.Failure("Failure message")) }
+            ?: return@launch updateState { copy(contentState = sas()) }
         // Map post to ui state
         val samplePostUiState = post2SamplePostUiStateMapper.map(post)
 
@@ -72,4 +73,11 @@ class ImageScreenViewModel @Inject constructor(
             copy(contentState = ContentState.Content(samplePostUiState))
         }
     }
+
+    private fun sas() = ContentState.Failure(
+        title = "Could not retrieve post",
+        description = "",
+        button = "Retry",
+        event = ImageScreenEvent.Retry,
+    )
 }
