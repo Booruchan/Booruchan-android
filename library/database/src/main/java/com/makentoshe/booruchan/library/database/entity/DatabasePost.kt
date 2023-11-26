@@ -12,4 +12,8 @@ data class DatabasePost(
     val previewImageUrl: String,
     val previewImageWidth: Int,
     val previewImageHeight: Int,
+
+    val sampleImageUrl: String,
+    val sampleImageWidth: Int,
+    val sampleImageHeight: Int,
 )

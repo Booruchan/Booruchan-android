@@ -7,6 +7,6 @@ import javax.inject.Inject
 class Post2SamplePostUiStateMapper @Inject constructor() {
     fun map(post: Post) = SamplePostUiState(
         id = post.id,
-        url = post.previewImageUrl,
+        url = post.sampleImageUrl,
     )
 }

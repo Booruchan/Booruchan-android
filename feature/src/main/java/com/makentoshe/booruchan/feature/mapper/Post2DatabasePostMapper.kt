@@ -13,5 +13,8 @@ class Post2DatabasePostMapper @Inject constructor() {
         previewImageUrl = networkPost.previewImageUrl,
         previewImageHeight = networkPost.previewImageHeight,
         previewImageWidth = networkPost.previewImageWidth,
+        sampleImageUrl = networkPost.sampleImageUrl,
+        sampleImageHeight = networkPost.sampleImageHeight,
+        sampleImageWidth = networkPost.sampleImageWidth,
     )
 }

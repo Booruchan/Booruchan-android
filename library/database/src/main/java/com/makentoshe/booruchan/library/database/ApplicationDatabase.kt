@@ -15,7 +15,7 @@ import com.makentoshe.booruchan.library.database.entity.DatabaseTagPostCrossRef
         DatabasePost::class,
         DatabaseTagPostCrossRef::class,
     ],
-    version = 6,
+    version = 7,
 )
 abstract class ApplicationDatabase : RoomDatabase() {
 
