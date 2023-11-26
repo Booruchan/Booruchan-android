@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.makentoshe.booruchan.extension.base.Source
 import com.makentoshe.booruchan.feature.EmptySource
 import com.makentoshe.booruchan.feature.PluginFactory
+import com.makentoshe.booruchan.feature.interactor.SourceInteractor
 import com.makentoshe.booruchan.feature.usecase.GetPostByIdUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
@@ -26,8 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ImageScreenViewModel @Inject constructor(
-    private val pluginFactory: PluginFactory,
-    private val findAllPlugins: GetAllPluginsUseCase,
+    private val sourceInteractor: SourceInteractor,
 
     private val getPost: GetPostByIdUseCase,
     private val post2SamplePostUiStateMapper: Post2SamplePostUiStateMapper,
@@ -36,11 +36,9 @@ class ImageScreenViewModel @Inject constructor(
     EventDelegate<ImageScreenEvent> by DefaultEventDelegate(),
     NavigationDelegate<ImageScreenDestination> by DefaultNavigationDelegate() {
 
-    private val sourceFlow = MutableStateFlow<Source>(EmptySource)
-
     init {
         viewModelScope.launch {
-            sourceFlow.collectLatest(::onSource)
+            sourceInteractor.sourceFlow.collectLatest(::onSource)
         }
     }
 
@@ -53,11 +51,9 @@ class ImageScreenViewModel @Inject constructor(
         internalLogInfo("invoke initialize for Source(${event.sourceId})")
         // store arguments in the state
         updateState { copy(sourceId = event.sourceId, postId = event.postId) }
-        // find source from plugin by source id or show failure state
-        val source = findAllPlugins().map(pluginFactory::buildSource).find { source -> source?.id == event.sourceId }
+        // getting source by id or null
+        sourceInteractor.getSourceById(event.sourceId)
             ?: return@iolaunch updateState { copy(contentState = pluginSourceNullContentState()) }
-        // invoke on source change sub-flow
-        sourceFlow.emit(source)
     }
 
     private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
@@ -98,5 +94,4 @@ class ImageScreenViewModel @Inject constructor(
         button = null,
         event = null,
     )
-
 }

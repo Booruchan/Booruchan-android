@@ -19,6 +19,7 @@ buildscript {
         compose_material_version = '1.4.3'
         compose_foundation_version = '1.3.0'
         compose_flow_version = '0.33.1-alpha'
+        compose_zoomable_version = '1.4.3'
 
         android_activity_compose_version = '1.3.1'
 
