@@ -4,5 +4,7 @@ sealed interface ImageScreenEvent {
 
     data class Initialize(val sourceId: String, val postId: String): ImageScreenEvent
 
+    object NavigationBack: ImageScreenEvent
+
     object Retry: ImageScreenEvent
 }

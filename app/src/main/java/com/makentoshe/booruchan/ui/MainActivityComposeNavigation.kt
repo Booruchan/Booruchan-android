@@ -76,6 +76,6 @@ private fun NavGraphBuilder.imageScreen(navController: NavController) {
     composable(route = screen.route, arguments = screen.arguments) { entry ->
         val sourceId = entry.arguments?.getString(screen.sourceIdArgument.name)!!
         val postId = entry.arguments?.getString(screen.postIdArgument.name)!!
-        ImageScreen(sourceId = sourceId, postId = postId)//(navigator = navigator, sourceId = sourceId)
+        ImageScreen(sourceId = sourceId, postId = postId, navigator = navigator)
     }
 }

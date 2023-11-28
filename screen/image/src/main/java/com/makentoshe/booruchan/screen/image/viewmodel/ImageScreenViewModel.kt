@@ -44,6 +44,7 @@ class ImageScreenViewModel @Inject constructor(
 
     override fun handleEvent(event: ImageScreenEvent) = when (event) {
         is ImageScreenEvent.Initialize -> initialize(event)
+        is ImageScreenEvent.NavigationBack -> navigationBack()
         ImageScreenEvent.Retry -> retry()
     }
 
@@ -81,6 +82,10 @@ class ImageScreenViewModel @Inject constructor(
         updateState { copy(contentState = ContentState.Loading) }
         // Request post content again
         requestSamplePostContent(state.sourceId, state.postId)
+    }
+
+    private fun navigationBack() {
+        updateNavigation { ImageScreenDestination.BackDestination }
     }
 
     private fun sas() = ContentState.Failure(
