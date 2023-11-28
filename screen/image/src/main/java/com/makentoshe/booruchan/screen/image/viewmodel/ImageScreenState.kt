@@ -7,12 +7,14 @@ import com.makentoshe.booruchan.screen.image.entity.SamplePostUiState
 data class ImageScreenState(
     val sourceId: String,
     val postId: String,
+    val sourceTitle: String,
     val contentState: ContentState,
 ) {
     companion object {
         val InitialState = ImageScreenState(
             sourceId = "",
             postId = "",
+            sourceTitle = "",
             contentState = ContentState.Loading,
         )
     }

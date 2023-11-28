@@ -8,5 +8,6 @@ class Post2SamplePostUiStateMapper @Inject constructor() {
     fun map(post: Post) = SamplePostUiState(
         id = post.id,
         url = post.sampleImageUrl,
+        ratio = post.sampleImageWidth.toFloat() / post.sampleImageHeight.toFloat(),
     )
 }

@@ -59,6 +59,8 @@ class ImageScreenViewModel @Inject constructor(
     private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
         if (source is EmptySource) return@launch
+        // Show source title
+        updateState { copy(sourceTitle = source.title) }
         // Request post content
         requestSamplePostContent(state.sourceId, state.postId)
     }

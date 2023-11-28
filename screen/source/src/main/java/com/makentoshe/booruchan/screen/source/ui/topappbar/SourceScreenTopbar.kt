@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
+import com.makentoshe.library.uikit.foundation.SmallTopAppBar
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
@@ -17,9 +18,7 @@ internal fun SourceScreenTopbar(
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(modifier = Modifier) {
 
-    TopAppBar(
-        backgroundColor = BooruchanTheme.colors.background,
-        elevation = 0.dp,
+    SmallTopAppBar(
         title = {
             SourceScreenTopbarTitle(screenState = screenState)
         },
