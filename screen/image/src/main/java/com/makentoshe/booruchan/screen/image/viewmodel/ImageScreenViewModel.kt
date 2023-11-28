@@ -18,6 +18,8 @@ import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
 import com.makentoshe.booruchan.screen.image.mapper.Post2SamplePostUiStateMapper
+import com.makentoshe.booruchan.screen.image.mapper.Post2TagsRatingSegmentedButtonStateMapper
+import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +33,7 @@ class ImageScreenViewModel @Inject constructor(
 
     private val getPost: GetPostByIdUseCase,
     private val post2SamplePostUiStateMapper: Post2SamplePostUiStateMapper,
+    private val post2TagsRatingSegmentedButtonStateMapper: Post2TagsRatingSegmentedButtonStateMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
     StateDelegate<ImageScreenState> by DefaultStateDelegate(ImageScreenState.InitialState),
     EventDelegate<ImageScreenEvent> by DefaultEventDelegate(),
@@ -70,11 +73,17 @@ class ImageScreenViewModel @Inject constructor(
         // Receive post by its id
         val post = getPost(sourceId, postId)
             ?: return updateState { copy(contentState = sas()) }
-        // Map post to ui state
+        // Map post to ui states
         val samplePostUiState = post2SamplePostUiStateMapper.map(post)
+        val ratingSegmentedButtonState = post2TagsRatingSegmentedButtonStateMapper.map(post)
 
         updateState {
-            copy(contentState = ContentState.Content(samplePostUiState))
+            copy(
+                contentState = ContentState.Content(
+                    samplePostUiState = samplePostUiState,
+                    ratingSegmentedButtonState = ratingSegmentedButtonState,
+                ),
+            )
         }
     }
 

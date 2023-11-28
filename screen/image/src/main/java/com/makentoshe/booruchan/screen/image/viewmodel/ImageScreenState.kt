@@ -2,6 +2,7 @@ package com.makentoshe.booruchan.screen.image.viewmodel
 
 import androidx.compose.runtime.Immutable
 import com.makentoshe.booruchan.screen.image.entity.SamplePostUiState
+import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 
 @Immutable
 data class ImageScreenState(
@@ -35,5 +36,6 @@ sealed interface ContentState {
     @Immutable
     data class Content(
         val samplePostUiState: SamplePostUiState,
+        val ratingSegmentedButtonState: TagsRatingSegmentedButtonState,
     ): ContentState
 }
