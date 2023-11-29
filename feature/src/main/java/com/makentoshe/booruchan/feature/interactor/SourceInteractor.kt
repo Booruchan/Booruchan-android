@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.interactor
 
-import com.makentoshe.booruchan.extension.base.Source
+import org.booruchan.extension.sdk.Source
 import com.makentoshe.booruchan.feature.EmptySource
 import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase

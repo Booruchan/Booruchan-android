@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.healthcheck
 
-import com.makentoshe.booruchan.extension.base.network.NetworkRequest
+import org.booruchan.extension.sdk.network.NetworkRequest
 import com.makentoshe.booruchan.feature.network.NetworkRepository
 import javax.inject.Inject
 

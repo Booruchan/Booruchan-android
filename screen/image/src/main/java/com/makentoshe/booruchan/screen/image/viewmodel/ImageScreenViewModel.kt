@@ -2,7 +2,7 @@ package com.makentoshe.booruchan.screen.image.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.makentoshe.booruchan.extension.base.Source
+import org.booruchan.extension.sdk.Source
 import com.makentoshe.booruchan.feature.EmptySource
 import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.feature.interactor.SourceInteractor

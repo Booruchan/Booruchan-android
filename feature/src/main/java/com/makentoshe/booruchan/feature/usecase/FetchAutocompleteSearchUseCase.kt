@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.usecase
 
-import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
+import org.booruchan.extension.sdk.factory.AutocompleteSearchFactory
 import com.makentoshe.booruchan.feature.entity.Autocomplete
 import com.makentoshe.booruchan.feature.mapper.NetworkAutocomplete2AutocompleteMapper
 import com.makentoshe.booruchan.feature.network.NetworkRepository

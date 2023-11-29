@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.makentoshe.booruchan.extension.base.Source
-import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
-import com.makentoshe.booruchan.extension.base.settings.SourceSearchSettings
+import org.booruchan.extension.sdk.Source
+import org.booruchan.extension.sdk.factory.AutocompleteSearchFactory
+import org.booruchan.extension.sdk.settings.SourceSearchSettings
 import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.feature.entity.ActionSearchHistory
 import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase

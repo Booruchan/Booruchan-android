@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.usecase
 
-import com.makentoshe.booruchan.extension.base.Source
+import org.booruchan.extension.sdk.Source
 import com.makentoshe.booruchan.feature.entity.Autocomplete
 import com.makentoshe.booruchan.feature.mapper.Autocomplete2DatabaseTagMapper
 import com.makentoshe.booruchan.library.database.ApplicationDatabase

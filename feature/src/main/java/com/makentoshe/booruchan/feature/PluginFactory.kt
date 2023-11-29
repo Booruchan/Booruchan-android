@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature
 
-import com.makentoshe.booruchan.extension.base.Source
+import org.booruchan.extension.sdk.Source
 import com.makentoshe.booruchan.library.plugin.Plugin
 import javax.inject.Inject
 

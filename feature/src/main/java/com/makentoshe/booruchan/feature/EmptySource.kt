@@ -1,11 +1,11 @@
 package com.makentoshe.booruchan.feature
 
-import com.makentoshe.booruchan.extension.base.Source
-import com.makentoshe.booruchan.extension.base.factory.AutocompleteSearchFactory
-import com.makentoshe.booruchan.extension.base.factory.FetchPostsFactory
-import com.makentoshe.booruchan.extension.base.factory.HealthCheckFactory
-import com.makentoshe.booruchan.extension.base.settings.SourceSearchSettings
-import com.makentoshe.booruchan.extension.base.settings.SourceSettings
+import org.booruchan.extension.sdk.Source
+import org.booruchan.extension.sdk.factory.AutocompleteSearchFactory
+import org.booruchan.extension.sdk.factory.FetchPostsFactory
+import org.booruchan.extension.sdk.factory.HealthCheckFactory
+import org.booruchan.extension.sdk.settings.SourceSearchSettings
+import org.booruchan.extension.sdk.settings.SourceSettings
 
 object EmptySource : Source {
     override val host: String get() = "host"

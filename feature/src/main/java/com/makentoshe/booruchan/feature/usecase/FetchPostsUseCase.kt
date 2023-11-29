@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.usecase
 
-import com.makentoshe.booruchan.extension.base.factory.FetchPostsFactory
+import org.booruchan.extension.sdk.factory.FetchPostsFactory
 import com.makentoshe.booruchan.feature.entity.Post
 import com.makentoshe.booruchan.feature.mapper.NetworkPost2PostMapper
 import com.makentoshe.booruchan.feature.network.NetworkRepository

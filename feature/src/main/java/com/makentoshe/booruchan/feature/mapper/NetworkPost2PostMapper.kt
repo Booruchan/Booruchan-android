@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.mapper
 
-import com.makentoshe.booruchan.extension.base.entity.NetworkPost
+import org.booruchan.extension.sdk.entity.NetworkPost
 import com.makentoshe.booruchan.feature.entity.Post
 import javax.inject.Inject
 
