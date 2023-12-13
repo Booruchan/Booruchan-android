@@ -8,9 +8,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dalvik.system.PathClassLoader
 import javax.inject.Inject
 
-private const val PLUGIN_SOURCE_CLASS = "com.makentoshe.booruchan.extension.source"
+private const val PLUGIN_SOURCE_CLASS = "org.booruchan.extension.source"
 
-private const val USES_FEATURE_PLUGIN = "com.makentoshe.booruchan.extension"
+private const val USES_FEATURE_PLUGIN = "com.booruchan.extension"
 
 private val PACKAGE_FLAGS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
     PackageManager.GET_CONFIGURATIONS or PackageManager.GET_SIGNING_CERTIFICATES
