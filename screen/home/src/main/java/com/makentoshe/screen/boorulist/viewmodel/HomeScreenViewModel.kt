@@ -93,7 +93,10 @@ class HomeScreenViewModel @Inject constructor(
         internalLogInfo("refresh plugins invoked")
 
         viewModelScope.iolaunch(Dispatchers.IO) {
-            val sources = findAllPlugins().mapNotNull(pluginFactory::buildSource).onEach(::onHealthCheckSource)
+            val plugins = findAllPlugins()
+            internalLogInfo("Found ${plugins.count()} plugins")
+
+            val sources = plugins.mapNotNull(pluginFactory::buildSource).onEach(::onHealthCheckSource)
             val sourceUiList = sources.map(source2SourceUiStateMapper::map)
             updateState {
                 copy(pluginContent = HomeScreenPluginContent.Content(sources = sourceUiList, refreshing = false))
