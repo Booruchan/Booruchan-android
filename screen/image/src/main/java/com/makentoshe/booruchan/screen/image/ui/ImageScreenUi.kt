@@ -28,8 +28,13 @@ fun ImageScreenUi(
     val verticalPagerState = rememberPagerState(initialPage = 1) { 3 }
 
     val screenAlpha by remember(verticalPagerState.currentPageOffsetFraction) {
-        if (verticalPagerState.currentPage == 0) return@remember mutableFloatStateOf(0f)
-        mutableFloatStateOf(1 - (-verticalPagerState.currentPageOffsetFraction * 2))
+        if (verticalPagerState.currentPage == 0) {
+            return@remember mutableFloatStateOf(0f)
+        }
+        if (verticalPagerState.currentPage == 2) {
+            return@remember mutableFloatStateOf(1f)
+        }
+        return@remember mutableFloatStateOf(1 - (-verticalPagerState.currentPageOffsetFraction * 2))
     }
 
     LaunchedEffect(key1 = verticalPagerState.currentPage) {

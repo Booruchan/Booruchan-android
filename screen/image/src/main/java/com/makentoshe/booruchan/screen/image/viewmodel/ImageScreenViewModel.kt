@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import org.booruchan.extension.sdk.Source
 import com.makentoshe.booruchan.feature.EmptySource
-import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.feature.interactor.SourceInteractor
 import com.makentoshe.booruchan.feature.usecase.GetPostByIdUseCase
+import com.makentoshe.booruchan.feature.usecase.GetTagByValueUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -16,13 +16,10 @@ import com.makentoshe.booruchan.library.feature.EventDelegate
 import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
-import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
 import com.makentoshe.booruchan.screen.image.mapper.Post2SamplePostUiStateMapper
 import com.makentoshe.booruchan.screen.image.mapper.Post2TagsRatingSegmentedButtonStateMapper
-import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,6 +29,8 @@ class ImageScreenViewModel @Inject constructor(
     private val sourceInteractor: SourceInteractor,
 
     private val getPost: GetPostByIdUseCase,
+    private val getTag: GetTagByValueUseCase,
+
     private val post2SamplePostUiStateMapper: Post2SamplePostUiStateMapper,
     private val post2TagsRatingSegmentedButtonStateMapper: Post2TagsRatingSegmentedButtonStateMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
@@ -72,7 +71,8 @@ class ImageScreenViewModel @Inject constructor(
     private suspend fun requestSamplePostContent(sourceId: String, postId: String) {
         // Receive post by its id
         val post = getPost(sourceId, postId)
-            ?: return updateState { copy(contentState = sas()) }
+            ?: return updateState { copy(contentState = couldNotGetPostByIdContentState()) }
+
         // Map post to ui states
         val samplePostUiState = post2SamplePostUiStateMapper.map(post)
         val ratingSegmentedButtonState = post2TagsRatingSegmentedButtonStateMapper.map(post)
@@ -97,7 +97,7 @@ class ImageScreenViewModel @Inject constructor(
         updateNavigation { ImageScreenDestination.BackDestination }
     }
 
-    private fun sas() = ContentState.Failure(
+    private fun couldNotGetPostByIdContentState() = ContentState.Failure(
         title = "Could not retrieve post",
         description = "",
         button = "Retry",

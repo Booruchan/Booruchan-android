@@ -1,6 +1,7 @@
 package com.makentoshe.booruchan.screen.image.viewmodel
 
 import androidx.compose.runtime.Immutable
+import com.makentoshe.booruchan.screen.entity.TagUiState
 import com.makentoshe.booruchan.screen.image.entity.SamplePostUiState
 import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 
