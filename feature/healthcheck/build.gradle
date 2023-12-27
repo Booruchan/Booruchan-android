@@ -34,7 +34,7 @@ android {
 dependencies {
     implementation(project(":feature"))
 
-    implementation "com.github.Booruchan.Booruchan-extensions:sdk:master-SNAPSHOT"
+    implementation "com.github.Booruchan.Booruchan-extensions:sdk:$booruchan_plugin_version"
 
     // Dagger and Hilt
     implementation "com.google.dagger:dagger:$dagger_version"
