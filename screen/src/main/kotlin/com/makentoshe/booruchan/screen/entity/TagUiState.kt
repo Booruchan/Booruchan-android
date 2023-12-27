@@ -1,11 +1,11 @@
 package com.makentoshe.booruchan.screen.entity
 
 
-enum class TagType {
+enum class TagUiStateType {
     General, Artist, Character, Copyright, Metadata, Other
 }
 
-data class TagUiState(val tag: String, val type: TagType) {
+data class TagUiState(val tag: String, val type: TagUiStateType) {
 
     val string: String // prettified tag string for displaying
         get() = tag.replace("_", " ")
