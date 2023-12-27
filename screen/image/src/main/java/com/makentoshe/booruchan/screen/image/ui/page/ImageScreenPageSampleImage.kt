@@ -10,6 +10,8 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
+import com.makentoshe.booruchan.library.logging.screenLogInfo
+import com.makentoshe.booruchan.screen.Screen
 import com.makentoshe.booruchan.screen.image.viewmodel.ContentState
 import com.makentoshe.library.uikit.foundation.IndeterminateProgressBar
 import net.engawapg.lib.zoomable.rememberZoomState
@@ -35,4 +37,6 @@ internal fun ImageScreenPageSampleImage(
             IndeterminateProgressBar(modifier = Modifier.wrapContentSize())
         }
     )
+
+    screenLogInfo(Screen.Image, "Loading content for Post(id=${contentState.samplePostImageState.id}): ${contentState.samplePostImageState.url}")
 }
