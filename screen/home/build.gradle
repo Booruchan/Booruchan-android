@@ -51,7 +51,7 @@ dependencies {
 
     implementation project(":screen")
 
-    implementation "com.github.Booruchan.Booruchan-extensions:extension-sdk:03f9935878"
+    implementation "com.github.Booruchan.Booruchan-extensions:sdk:master-SNAPSHOT"
 
     implementation "androidx.core:core-ktx:$android_core_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$android_lifecycle_version"

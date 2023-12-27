@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import com.makentoshe.booruchan.screen.image.ui.components.lazylist.openComments
 import com.makentoshe.booruchan.screen.image.ui.components.lazylist.downloadImageItem
 import com.makentoshe.booruchan.screen.image.ui.components.lazylist.imageRatingItem
 import com.makentoshe.booruchan.screen.image.ui.components.lazylist.imageScoresItem
+import com.makentoshe.booruchan.screen.image.ui.components.lazylist.imageTagsItem
 import com.makentoshe.booruchan.screen.image.viewmodel.ContentState
 
 @Composable
@@ -31,13 +33,8 @@ internal fun ImageScreenPageSampleInfo(
     downloadImageItem()
     openCommentsItem()
     imageScoresItem()
-    imageRatingItem(state = contentState.ratingSegmentedButtonState)
-
-    item(key = "tags") {
-        Box(modifier = Modifier.fillMaxWidth().height(256.dp).background(Color.Cyan)) {
-            Text(text = "Tags")
-        }
-    }
+    imageRatingItem(state = contentState.samplePostRatingState)
+    imageTagsItem(state = contentState.samplePostTagsState)
 
     item(key = "posted") {
         Box(modifier = Modifier.fillMaxWidth().height(256.dp).background(Color.Magenta)) {

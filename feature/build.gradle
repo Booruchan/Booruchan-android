@@ -35,7 +35,7 @@ dependencies {
     implementation(project(":library:plugin"))
     implementation(project(":library:database"))
 
-    implementation "com.github.Booruchan.Booruchan-extensions:extension-sdk:03f9935878"
+    implementation "com.github.Booruchan.Booruchan-extensions:sdk:master-SNAPSHOT"
 
     // Ktor
     implementation "io.ktor:ktor-client-core:$ktor_version"

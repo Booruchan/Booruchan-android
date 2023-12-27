@@ -22,7 +22,7 @@ internal fun ImageScreenPageSampleImage(
     modifier = Modifier.fillMaxSize(),
 ) {
     val request = ImageRequest.Builder(LocalContext.current)
-        .data(contentState.samplePostUiState.url)
+        .data(contentState.samplePostImageState.url)
         .size(Size.ORIGINAL)
         .build()
 

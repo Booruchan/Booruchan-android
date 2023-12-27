@@ -2,16 +2,20 @@
 <resources>
     <string name="app_name">Booruchan</string>
 
-
     <string name="home_source_host_empty">Couldn\'t display source host property</string>
     <string name="home_source_loading">%s</string>
     <string name="home_source_error">%s - not available</string>
     <string name="home_source_ok">%s</string>
 
 
+    <!--    TODO: replace with component strings-->
     <string name="source_search_tag_rating">Rating</string>
+<!--    TODO: replace with component strings-->
     <string name="source_search_tags_general">General</string>
 
     <string name="source_search_apply_filters_button">Apply filters</string>
+
+    <string name="component_tags_title">Tags</string>
+    <string name="component_tags_general_title">General</string>
 
 </resources>

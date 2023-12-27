@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.library.resources.R
-import com.makentoshe.booruchan.screen.source.ui.components.chip.ChipGroup
 import com.makentoshe.booruchan.screen.source.ui.components.chip.ChipItem
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
+import com.makentoshe.library.uikit.foundation.ChipGroup
 import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 

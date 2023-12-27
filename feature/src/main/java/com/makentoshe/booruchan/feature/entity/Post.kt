@@ -2,6 +2,7 @@ package com.makentoshe.booruchan.feature.entity
 
 data class Post(
     val id: String,
+    /** Contains tag values */
     val tags: List<String>,
 
     val previewImageUrl: String,
