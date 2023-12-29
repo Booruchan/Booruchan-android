@@ -9,14 +9,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.makentoshe.booruchan.feature.EmptySource
-import org.booruchan.extension.sdk.Source
-import org.booruchan.extension.sdk.factory.AutocompleteSearchFactory
-import org.booruchan.extension.sdk.settings.SourceSearchSettings
-import com.makentoshe.booruchan.feature.PluginFactory
 import com.makentoshe.booruchan.feature.entity.ActionSearchHistory
+import com.makentoshe.booruchan.feature.interactor.AutocompleteInteractor
 import com.makentoshe.booruchan.feature.interactor.PluginInteractor
-import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase
-import com.makentoshe.booruchan.feature.usecase.SetAutocompleteSearchUseCase
 import com.makentoshe.booruchan.feature.usecase.SetActionSearchHistoryUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
@@ -29,7 +24,6 @@ import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEntityMapper
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
-import com.makentoshe.booruchan.feature.usecase.GetAllPluginsUseCase
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
@@ -37,18 +31,17 @@ import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.booruchan.extension.sdk.Source
+import org.booruchan.extension.sdk.settings.SourceSearchSettings
 import javax.inject.Inject
 
 @HiltViewModel
 class SourceScreenViewModel @Inject constructor(
     private val pluginInteractor: PluginInteractor,
+    private val autocompleteInteractor: AutocompleteInteractor,
 
-    private val fetchAutocompleteSearch: FetchAutocompleteSearchUseCase,
-    private val setAutocompleteSearch: SetAutocompleteSearchUseCase,
     private val setActionSearchHistory: SetActionSearchHistoryUseCase,
     private val pagingSourceFactory: PagingSourceFactory,
     private val autocompleteUiStateMapper: Autocomplete2AutocompleteUiStateMapper,
@@ -58,11 +51,12 @@ class SourceScreenViewModel @Inject constructor(
     EventDelegate<SourceScreenEvent> by DefaultEventDelegate(),
     NavigationDelegate<SourceScreenDestination> by DefaultNavigationDelegate() {
 
-    private var autocompleteJob: Job? = null
-
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             pluginInteractor.sourceFlow.collectLatest(::onSource)
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            autocompleteInteractor.autocompleteFlow.collectLatest(::onAutocomplete)
         }
     }
 
@@ -114,6 +108,39 @@ class SourceScreenViewModel @Inject constructor(
         storeSourceSearch()
     }
 
+    private fun onAutocomplete(autocompleteState: AutocompleteInteractor.State) = when (autocompleteState) {
+        is AutocompleteInteractor.State.None -> updateState {
+            internalLogInfo("autocomplete None state")
+            copy(
+                searchState = searchState.copy(
+                    value = autocompleteState.value,
+                    autocompleteState = AutocompleteState.None,
+                )
+            )
+        }
+
+        is AutocompleteInteractor.State.Loading -> updateState {
+            internalLogInfo("autocomplete Loading state")
+            copy(
+                searchState = searchState.copy(
+                    value = autocompleteState.value,
+                    autocompleteState = AutocompleteState.Loading,
+                )
+            )
+        }
+
+        is AutocompleteInteractor.State.Content -> updateState {
+            internalLogInfo("autocomplete Content(${autocompleteState.autocompletes}) state")
+            val autocompleteUiStates = autocompleteState.autocompletes.map(autocompleteUiStateMapper::map).toSet()
+            copy(
+                searchState = searchState.copy(
+                    value = autocompleteState.value,
+                    autocompleteState = AutocompleteState.Content(autocompleteUiStates),
+                )
+            )
+        }
+    }
+
     private fun navigationBack() {
         internalLogInfo("invoke navigation back")
         updateNavigation { SourceScreenDestination.BackDestination }
@@ -127,7 +154,7 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
         val source = pluginInteractor.sourceFlow.value
-        internalLogInfo("invoke search value change: ${event.value} ${autocompleteJob?.isActive}")
+        internalLogInfo("invoke search value change: ${event.value}")
 
         val searchValueLastCharacter = event.value.lastOrNull()?.toString()
         val searchTags = source.settings.searchSettings.searchTags
@@ -143,38 +170,10 @@ class SourceScreenViewModel @Inject constructor(
             copy(searchState = searchState.copy(value = event.value, autocompleteState = AutocompleteState.None))
         }
 
-        autocompleteJob?.cancel() // cancel previous autocomplete job
-        autocompleteJob = viewModelScope.launch(Dispatchers.IO) { fetchAutocomplete(event.value) }
-    }
-
-    private suspend fun fetchAutocomplete(autocompleteSearchValue: String) {
-        val source = pluginInteractor.sourceFlow.value
-        // finish job immediately if source is not initialized
-        if (source is EmptySource) return
-        // finish job immediately on empty search
-        if (autocompleteSearchValue.isEmpty()) return
-        // delay between input and autocomplete starting
-        delay(350)
-
-        updateState { copy(searchState = searchState.copy(autocompleteState = AutocompleteState.Loading)) }
-        internalLogInfo("invoke autocomplete search: $autocompleteSearchValue")
-
-        // find source from plugin by source id or show failure state
-        // return if autocomplete search factory is not implemented
-        val autocompleteSearchFactory = source.autocompleteSearchFactory
-            ?: return internalLogWarn("autocomplete search factory is not implemented")
-
-        // request autocompletion
-        val autocompleteSearchRequest = AutocompleteSearchFactory.AutocompleteSearchRequest(autocompleteSearchValue)
-        val autocompletes = fetchAutocompleteSearch(autocompleteSearchFactory, autocompleteSearchRequest)
-        val autocompleteUiStates = autocompletes.map(autocompleteUiStateMapper::map).toSet()
-        // store autocomplete tags to tags database
-        setAutocompleteSearch(source, autocompletes)
-
-        // show autocompletion
-        internalLogInfo("autocomplete search success: $autocompletes")
-        updateState {
-            copy(searchState = searchState.copy(autocompleteState = AutocompleteState.Content(autocompleteUiStates)))
+        viewModelScope.launch(Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
+            internalLogWarn(throwable.message ?: "")
+        }) {
+            autocompleteInteractor.fetchAutocomplete(source, event.value)
         }
     }
 
