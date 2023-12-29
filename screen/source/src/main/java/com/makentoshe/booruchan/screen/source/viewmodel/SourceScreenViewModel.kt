@@ -11,7 +11,6 @@ import androidx.paging.cachedIn
 import com.makentoshe.booruchan.feature.EmptySource
 import com.makentoshe.booruchan.feature.interactor.AutocompleteInteractor
 import com.makentoshe.booruchan.feature.interactor.PluginInteractor
-import com.makentoshe.booruchan.feature.usecase.SetActionSearchHistoryUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -43,7 +42,6 @@ class SourceScreenViewModel @Inject constructor(
     private val pluginInteractor: PluginInteractor,
     private val autocompleteInteractor: AutocompleteInteractor,
 
-    private val setActionSearchHistory: SetActionSearchHistoryUseCase,
     private val pagingSourceFactory: PagingSourceFactory,
     private val autocompleteUiStateMapper: Autocomplete2AutocompleteUiStateMapper,
     private val throwable2ThrowableEntityMapper: Throwable2ThrowableEntityMapper,
@@ -178,11 +176,13 @@ class SourceScreenViewModel @Inject constructor(
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
         val source = pluginInteractor.sourceFlow.value
         internalLogInfo("invoke search value change: ${event.value}")
-
+        // Symbols that indicates a new tag or separation between tags
+        val searchTagSymbols = source.settings.searchSettings.searchTags
+        // Get last input character
         val searchValueLastCharacter = event.value.lastOrNull()?.toString()
-        val searchTags = source.settings.searchSettings.searchTags
 
-        if (searchValueLastCharacter != null && searchTags.contains(searchValueLastCharacter) && event.value.count() > 2) {
+        // Check is the last character indicates a new tag input
+        if (searchValueLastCharacter != null && searchTagSymbols.contains(searchValueLastCharacter) && event.value.count() > 2) {
             handleEvent(SourceScreenEvent.SearchTagAdd(event.value))
             return updateState {
                 copy(searchState = searchState.copy(value = "", autocompleteState = AutocompleteState.None))
@@ -307,7 +307,12 @@ class SourceScreenViewModel @Inject constructor(
             if (generalTag != null) {
                 val newGeneralTags = state.generalTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
                 return@launch updateState {
-                    copy(generalTagsContentState = generalTagsContentState.copy(tags = newGeneralTags))
+                    copy(
+                        generalTagsContentState = generalTagsContentState.copy(
+                            visible = newGeneralTags.isNotEmpty(),
+                            tags = newGeneralTags
+                        )
+                    )
                 }
             }
 
