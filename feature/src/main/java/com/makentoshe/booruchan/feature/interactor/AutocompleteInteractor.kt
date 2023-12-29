@@ -6,6 +6,7 @@ import com.makentoshe.booruchan.feature.exception.FetchAutocompleteEmptyExceptio
 import com.makentoshe.booruchan.feature.exception.FetchAutocompleteFactoryException
 import com.makentoshe.booruchan.feature.exception.FetchAutocompleteSourceException
 import com.makentoshe.booruchan.feature.usecase.FetchAutocompleteSearchUseCase
+import com.makentoshe.booruchan.feature.usecase.SetAutocompleteSearchUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -19,6 +20,7 @@ import javax.inject.Inject
 
 class AutocompleteInteractor @Inject constructor(
     private val fetchAutocompleteSearch: FetchAutocompleteSearchUseCase,
+    private val setAutocompleteSearch: SetAutocompleteSearchUseCase,
 ) {
 
     private var autocompleteJob: Job? = null
@@ -50,15 +52,17 @@ class AutocompleteInteractor @Inject constructor(
         // Start loading
         internalAutocompleteFlow.emit(State.Loading(autocompleteSearchValue))
         // Execute autocompletion
-        fetchAutocompleteJob(autocompleteSearchFactory, autocompleteSearchValue)
+        fetchAutocompleteJob(source, autocompleteSearchFactory, autocompleteSearchValue)
     }
 
-    private suspend fun fetchAutocompleteJob(factory: AutocompleteSearchFactory, value: String) {
+    private suspend fun fetchAutocompleteJob(source: Source, factory: AutocompleteSearchFactory, value: String) {
         // request autocompletion
         val request = AutocompleteSearchFactory.AutocompleteSearchRequest(value)
         val autocompletes = fetchAutocompleteSearch(factory, request)
         // invoke flow on new autocomplete values
         internalAutocompleteFlow.emit(State.Content(value, autocompletes))
+        // Store autocompletes in the database
+        autocompletes.forEach { autocomplete -> setAutocompleteSearch(source, autocomplete) }
     }
 
     sealed interface State {

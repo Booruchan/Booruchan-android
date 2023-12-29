@@ -12,5 +12,6 @@ class NetworkAutocomplete2AutocompleteMapper @Inject constructor(
         value = networkAutocomplete.value,
         count = networkAutocomplete.count,
         type = networkTagType2TagTypeMapper.map(networkAutocomplete.type),
+        id = "",
     )
 }
