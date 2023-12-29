@@ -18,6 +18,8 @@ data class SourceScreenState(
 
     /** State for rating metadata tag */
     val ratingTagContentState: SourceScreenRatingTagContentState,
+    /** State for all general tags */
+    val generalTagsContentState: SourceScreenGeneralTagsContentState,
 ) {
     companion object {
         val InitialState = SourceScreenState(
@@ -28,13 +30,16 @@ data class SourceScreenState(
             searchState = SourceScreenSearchState(
                 value = "",
                 label = "Ex: blue_sky cloud 1girl",
-                tags = emptySet(),
                 autocompleteState = AutocompleteState.None,
                 fullScreenState = SourceScreenSearchState.FullScreenState.Collapsed,
             ),
             ratingTagContentState = SourceScreenRatingTagContentState(
                 visible = false,
                 ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(values = emptyList())
+            ),
+            generalTagsContentState = SourceScreenGeneralTagsContentState(
+                visible = false,
+                tags = emptySet(),
             )
         )
     }
@@ -64,17 +69,11 @@ data class SourceScreenSearchState(
     val value: String,
     /** Search example label */
     val label: String,
-    /** All tags that was add to the filter except rating */
-    val tags: Set<TagUiState>,
-
     /** Autocompletion state */
     val autocompleteState: AutocompleteState,
     /** full screen search view state */
     val fullScreenState: FullScreenState,
 ) {
-    val generalTags: List<TagUiState>
-        get() = tags.filter { it.type == TagType.General }
-
     sealed interface FullScreenState {
         object Expanded : FullScreenState
         object Collapsed : FullScreenState
@@ -87,6 +86,14 @@ data class SourceScreenRatingTagContentState(
     val visible: Boolean,
     /** All values for "rating" metadata tag */
     val ratingTagSegmentedButtonState: TagsRatingSegmentedButtonState,
+)
+
+@Immutable
+data class SourceScreenGeneralTagsContentState(
+    /** Is component should be visible */
+    val visible: Boolean,
+    /** All general tags that was added to the filter */
+    val tags: Set<TagUiState>,
 )
 
 @Immutable

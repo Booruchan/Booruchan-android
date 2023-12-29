@@ -9,7 +9,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.makentoshe.booruchan.feature.EmptySource
-import com.makentoshe.booruchan.feature.entity.ActionSearchHistory
 import com.makentoshe.booruchan.feature.interactor.AutocompleteInteractor
 import com.makentoshe.booruchan.feature.interactor.PluginInteractor
 import com.makentoshe.booruchan.feature.usecase.SetActionSearchHistoryUseCase
@@ -36,7 +35,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.booruchan.extension.sdk.Source
-import org.booruchan.extension.sdk.settings.SourceRatingTagSettings
 import org.booruchan.extension.sdk.settings.SourceSearchSettings
 import javax.inject.Inject
 
@@ -74,7 +72,6 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.SearchTagChangeRating -> searchChangeTagRating(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
         is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
-        is SourceScreenEvent.StoreSourceSearch -> storeSourceSearch()
 
         SourceScreenEvent.ShowSearch -> showSearchViaFullScreen()
         SourceScreenEvent.DismissSearch -> dismissSearchViaFullScreen()
@@ -99,22 +96,10 @@ class SourceScreenViewModel @Inject constructor(
     private fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
         if (source is EmptySource) return@launch
+        // Show source title
+        updateState { copy(sourceTitle = source.title) }
 
-        // Get all available rating tag values
-        val ratingTagValues = source.settings.ratingTagSettings?.values ?: emptyList()
-
-        // Show source title and rating tag content state
-        updateState {
-            copy(
-                sourceTitle = source.title,
-                ratingTagContentState = SourceScreenRatingTagContentState(
-                    visible = false,
-                    ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(
-                        values = ratingTagValues,
-                    )
-                )
-            )
-        }
+        onSourceRatingTagContent(source)
 
         // get fetch posts factory or show failure state
         val fetchPostsFactory = source.fetchPostsFactory
@@ -127,8 +112,23 @@ class SourceScreenViewModel @Inject constructor(
         updateState {
             copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
         }
+    }
 
-        storeSourceSearch()
+    private fun onSourceRatingTagContent(source: Source) {
+        // Get first 3 rating tag values (we could not handle more than 3 yet)
+        val ratingTagValues = (source.settings.ratingTagSettings?.values ?: emptyList()).subList(0, 3)
+
+        // Show rating tag content state
+        updateState {
+            copy(
+                ratingTagContentState = SourceScreenRatingTagContentState(
+                    visible = false,
+                    ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(
+                        values = ratingTagValues,
+                    )
+                )
+            )
+        }
     }
 
     private fun onAutocomplete(autocompleteState: AutocompleteInteractor.State) = when (autocompleteState) {
@@ -225,9 +225,12 @@ class SourceScreenViewModel @Inject constructor(
                 copy(
                     searchState = searchState.copy(
                         value = "",
-                        tags = searchState.tags.plus(tagUiState),
                         autocompleteState = AutocompleteState.None
                     ),
+                    generalTagsContentState = generalTagsContentState.copy(
+                        visible = true,
+                        tags = generalTagsContentState.tags.plus(tagUiState)
+                    )
                 )
             }
         }
@@ -263,20 +266,6 @@ class SourceScreenViewModel @Inject constructor(
         }
     }
 
-    private fun storeSourceSearch() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val source = pluginInteractor.sourceFlow.value
-            internalLogInfo("invoke apply filters event: ${state.searchState.tags}")
-
-            // get fetch posts factory or do nothing
-            val fetchPostsFactory = source.fetchPostsFactory ?: return@launch
-
-            val tags = state.searchState.tags.joinToString(separator = fetchPostsFactory.searchTagSeparator) { it.tag }
-            val sourceSearchNavigation = ActionSearchHistory(source = source.id, search = tags)
-            setActionSearchHistory(sourceSearchNavigation)
-        }
-    }
-
     private fun searchApplyFilters() {
         viewModelScope.launch(
             context = Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
@@ -284,27 +273,28 @@ class SourceScreenViewModel @Inject constructor(
             },
         ) {
             val source = pluginInteractor.sourceFlow.value
-            internalLogInfo("invoke apply filters event: ${state.searchState.tags}")
 
             if (source is EmptySource) {
                 return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
             }
 
+            val generalTags = state.generalTagsContentState.tags
+
+            internalLogInfo("invoke apply filters event: $generalTags")
+
             // get fetch posts factory or show failure state
             val fetchPostsFactory = source.fetchPostsFactory
                 ?: return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
-            val query = state.searchState.tags.joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
+            val generalTagsQuery = generalTags.joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
 
             val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
-                pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, query)
+                pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, generalTagsQuery)
             }.flow.cachedIn(viewModelScope)
 
             updateState {
                 copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
             }
-
-            storeSourceSearch()
         }
     }
 
@@ -312,10 +302,16 @@ class SourceScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             internalLogInfo("invoke remove tag: ${event.tag}")
 
-            val tagUiState = state.searchState.tags.find { it.tag == event.tag }
-                ?: return@launch internalLogWarn("could not find tag: ${event.tag}")
+            // Remove from general tags
+            val generalTag = state.generalTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            if (generalTag != null) {
+                val newGeneralTags = state.generalTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                return@launch updateState {
+                    copy(generalTagsContentState = generalTagsContentState.copy(tags = newGeneralTags))
+                }
+            }
 
-            updateState { copy(searchState = searchState.copy(tags = searchState.tags.minus(tagUiState))) }
+            return@launch internalLogWarn("could not find tag: ${event.tag}")
         }
     }
 

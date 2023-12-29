@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.library.resources.R
 import com.makentoshe.booruchan.screen.source.ui.components.chip.ChipItem
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenGeneralTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenSearchState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.ChipGroup
@@ -31,36 +32,43 @@ internal fun SourceScreenSearchContentTags(
 ) {
     // Show rating tag selector only if there are any tags to select
     if (screenState.ratingTagContentState.visible) {
-        SourceScreenSearchContentTagsRating(searchState = screenState.ratingTagContentState, screenEvent = screenEvent)
+        SourceScreenSearchContentTagsRating(
+            searchState = screenState.ratingTagContentState,
+            screenEvent = screenEvent,
+        )
     }
 
-    SourceScreenSearchContentTagsGeneral(searchState = screenState.searchState, screenEvent = screenEvent)
+    // Show general tags  only if there are any tags to display
+    if (screenState.generalTagsContentState.visible) {
+        SourceScreenSearchContentTagsGeneral(
+            generalTagsContentState = screenState.generalTagsContentState,
+            screenEvent = screenEvent,
+        )
+    }
 }
 
 
 @Composable
 private fun SourceScreenSearchContentTagsGeneral(
-    searchState: SourceScreenSearchState,
+    generalTagsContentState: SourceScreenGeneralTagsContentState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) {
-    val generalTags by remember(key1 = searchState) {
-        mutableStateOf(searchState.generalTags)
+    val generalTags by remember(key1 = generalTagsContentState) {
+        mutableStateOf(generalTagsContentState.tags)
     }
 
-    if (generalTags.isNotEmpty()) {
-        Spacer(modifier = Modifier.size(16.dp))
+    Spacer(modifier = Modifier.size(16.dp))
 
-        SecondaryText(
-            text = stringResource(id = R.string.source_search_tags_general),
-            color = BooruchanTheme.colors.foreground,
-        )
+    SecondaryText(
+        text = stringResource(id = R.string.source_search_tags_general),
+        color = BooruchanTheme.colors.foreground,
+    )
 
-        Spacer(modifier = Modifier.size(8.dp))
+    Spacer(modifier = Modifier.size(8.dp))
 
-        ChipGroup(modifier = Modifier.fillMaxWidth()) {
-            generalTags.forEach { tagUiState ->
-                ChipItem(state = tagUiState, screenEvent = screenEvent)
-            }
+    ChipGroup(modifier = Modifier.fillMaxWidth()) {
+        generalTags.forEach { tagUiState ->
+            ChipItem(state = tagUiState, screenEvent = screenEvent)
         }
     }
 }
