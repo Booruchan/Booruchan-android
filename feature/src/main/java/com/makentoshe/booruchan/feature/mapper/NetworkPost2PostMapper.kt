@@ -8,6 +8,7 @@ class NetworkPost2PostMapper @Inject constructor() {
     fun map(networkPost: NetworkPost) = Post(
         id = networkPost.id.toString(),
         tags = networkPost.tags,
+        score = networkPost.score,
         previewImageUrl = networkPost.previewImageUrl,
         previewImageHeight = networkPost.previewImageHeight,
         previewImageWidth = networkPost.previewImageWidth,

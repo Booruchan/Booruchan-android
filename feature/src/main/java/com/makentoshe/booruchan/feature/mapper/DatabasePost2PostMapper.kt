@@ -9,6 +9,7 @@ class DatabasePost2PostMapper @Inject constructor() {
     fun map(databasePost: DatabasePost, tags: List<String>) = Post(
         id = databasePost.id,
         tags = tags,
+        score = databasePost.score,
         previewImageUrl = databasePost.previewImageUrl,
         previewImageHeight = databasePost.previewImageHeight,
         previewImageWidth = databasePost.previewImageWidth,

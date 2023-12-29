@@ -32,7 +32,7 @@ internal fun ImageScreenPageSampleInfo(
 ) {
     downloadImageItem()
     openCommentsItem()
-    imageScoresItem()
+    imageScoresItem(state = contentState.samplePostScoreState)
     imageRatingItem(state = contentState.samplePostRatingState)
     imageTagsItem(state = contentState.samplePostTagsState)
 

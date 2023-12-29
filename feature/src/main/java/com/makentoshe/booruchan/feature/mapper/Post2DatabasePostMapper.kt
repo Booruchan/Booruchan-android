@@ -7,14 +7,15 @@ import javax.inject.Inject
 
 class Post2DatabasePostMapper @Inject constructor() {
 
-    fun map(source: Source, networkPost: Post) = DatabasePost(
-        id = networkPost.id,
+    fun map(source: Source, post: Post) = DatabasePost(
+        id = post.id,
         source = source.id,
-        previewImageUrl = networkPost.previewImageUrl,
-        previewImageHeight = networkPost.previewImageHeight,
-        previewImageWidth = networkPost.previewImageWidth,
-        sampleImageUrl = networkPost.sampleImageUrl,
-        sampleImageHeight = networkPost.sampleImageHeight,
-        sampleImageWidth = networkPost.sampleImageWidth,
+        score = post.score,
+        previewImageUrl = post.previewImageUrl,
+        previewImageHeight = post.previewImageHeight,
+        previewImageWidth = post.previewImageWidth,
+        sampleImageUrl = post.sampleImageUrl,
+        sampleImageHeight = post.sampleImageHeight,
+        sampleImageWidth = post.sampleImageWidth,
     )
 }

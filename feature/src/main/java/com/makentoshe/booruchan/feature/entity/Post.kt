@@ -4,6 +4,7 @@ data class Post(
     val id: String,
     /** Contains tag values */
     val tags: List<String>,
+    val score: Int,
 
     val previewImageUrl: String,
     val previewImageWidth: Int,

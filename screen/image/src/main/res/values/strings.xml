@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_scores_title">Scores: %1$s</string>
+    <string name="image_scores_button_todo">Scores button not implemented</string>
+
+    <string name="image_scores_title_2">Scores: 35 ( ↑48 and ↓13 )</string>
+</resources>

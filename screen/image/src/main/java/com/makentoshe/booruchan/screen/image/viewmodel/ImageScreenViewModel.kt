@@ -16,6 +16,7 @@ import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.screen.image.mapper.Post2SamplePostImageStateMapper
+import com.makentoshe.booruchan.screen.image.mapper.Post2SamplePostScoreStateMapper
 import com.makentoshe.booruchan.screen.image.mapper.Post2SamplePostTagsStateMapper
 import com.makentoshe.booruchan.screen.image.mapper.Post2TagsRatingSegmentedButtonStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,6 +33,7 @@ class ImageScreenViewModel @Inject constructor(
 
     private val post2SamplePostImageStateMapper: Post2SamplePostImageStateMapper,
     private val post2SamplePostTagsStateMapper: Post2SamplePostTagsStateMapper,
+    private val post2SamplePostScoreStateMapper: Post2SamplePostScoreStateMapper,
     private val post2TagsRatingSegmentedButtonStateMapper: Post2TagsRatingSegmentedButtonStateMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
     StateDelegate<ImageScreenState> by DefaultStateDelegate(ImageScreenState.InitialState),
@@ -76,6 +78,7 @@ class ImageScreenViewModel @Inject constructor(
         // Map post to ui states
         val samplePostUiState = post2SamplePostImageStateMapper.map(post)
         val samplePostTagsState = post2SamplePostTagsStateMapper.map(post)
+        val samplePostScoreState = post2SamplePostScoreStateMapper.map(post)
         val ratingSegmentedButtonState = post2TagsRatingSegmentedButtonStateMapper.map(post)
 
         updateState {
@@ -83,6 +86,7 @@ class ImageScreenViewModel @Inject constructor(
                 contentState = ContentState.Content(
                     samplePostImageState = samplePostUiState,
                     samplePostTagsState = samplePostTagsState,
+                    samplePostScoreState = samplePostScoreState,
                     samplePostRatingState = ratingSegmentedButtonState,
                 ),
             )

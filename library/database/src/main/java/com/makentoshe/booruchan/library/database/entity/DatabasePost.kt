@@ -9,6 +9,8 @@ data class DatabasePost(
     /** Id in the source */
     val id: String,
 
+    val score: Int,
+
     val previewImageUrl: String,
     val previewImageWidth: Int,
     val previewImageHeight: Int,
