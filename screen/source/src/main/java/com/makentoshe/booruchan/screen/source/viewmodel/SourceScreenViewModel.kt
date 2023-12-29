@@ -22,18 +22,21 @@ import com.makentoshe.booruchan.library.feature.EventDelegate
 import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEntityMapper
+import com.makentoshe.booruchan.library.logging.internalLogError
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
+import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.booruchan.extension.sdk.Source
+import org.booruchan.extension.sdk.settings.SourceRatingTagSettings
 import org.booruchan.extension.sdk.settings.SourceSearchSettings
 import javax.inject.Inject
 
@@ -93,17 +96,21 @@ class SourceScreenViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
+    private fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
         if (source is EmptySource) return@launch
 
-        // Show source title and update rating meta tag values
+        // Get all available rating tag values
+        val ratingTagValues = source.settings.ratingTagSettings?.values ?: emptyList()
+
+        // Show source title and rating tag content state
         updateState {
             copy(
                 sourceTitle = source.title,
-                searchState = searchState.copy(
-                    ratingTagSegmentedButtonState = searchState.ratingTagSegmentedButtonState.copy(
-                        values = source.settings.ratingTagSettings?.values ?: emptyList(),
+                ratingTagContentState = SourceScreenRatingTagContentState(
+                    visible = false,
+                    ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(
+                        values = ratingTagValues,
                     )
                 )
             )
@@ -227,10 +234,15 @@ class SourceScreenViewModel @Inject constructor(
     }
 
     private fun searchChangeTagRating(event: SourceScreenEvent.SearchTagChangeRating) {
-        internalLogInfo("invoke change rating tag: ${event.index}")
+        val source = pluginInteractor.sourceFlow.value
+
+        internalLogInfo("invoke change rating tag")
+
+        val ratingTagSettings = source.settings.ratingTagSettings
+            ?: return internalLogError("Settings for \"rating\" tag were not define")
 
         // Get current selections list
-        val selected = state.searchState.ratingTagSegmentedButtonState.selected.toMutableList()
+        val selected = state.ratingTagContentState.ratingTagSegmentedButtonState.selected.toMutableList()
 
         // Change selection
         if (selected.contains(event.index)) {
@@ -239,47 +251,15 @@ class SourceScreenViewModel @Inject constructor(
             selected.add(event.index)
         }
 
-
-//        // General is a default type for tag
-//        val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
-//        // Append new tag to current tags, hide autocompletion and clear input field
-//        updateState {
-//            copy(
-//                searchState = searchState.copy(
-//                    value = "",
-//                    tags = searchState.tags.plus(tagUiState),
-//                    autocompleteState = AutocompleteState.None
-//                ),
-//            )
-//        }
-//        searchAddTag()
-
-        // Update selection
+        // Update selection state
         updateState {
             copy(
-                searchState = searchState.copy(
-                    ratingTagSegmentedButtonState = searchState.ratingTagSegmentedButtonState.copy(
+                ratingTagContentState = ratingTagContentState.copy(
+                    ratingTagSegmentedButtonState = ratingTagContentState.ratingTagSegmentedButtonState.copy(
                         selected = selected,
                     )
-                )
+                ),
             )
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-//            // skip any blank input: we're not interested in it
-//            if (event.tag.isBlank()) return@launch internalLogInfo("skip add tag: ${event.tag}")
-//            // General is a default type for tag
-//            val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
-//            // Append new tag to current tags, hide autocompletion and clear input field
-//            updateState {
-//                copy(
-//                    searchState = searchState.copy(
-//                        value = "",
-//                        tags = searchState.tags.plus(tagUiState),
-//                        autocompleteState = AutocompleteState.None
-//                    ),
-//                )
-//            }
         }
     }
 

@@ -24,7 +24,7 @@ internal fun SourceScreenSearchContent(
     Divider(modifier = Modifier.fillMaxWidth(), color = BooruchanTheme.colors.separator)
 
     Box(modifier = Modifier.fillMaxSize()) {
-        SourceScreenSearchContentTags(searchState = screenState.searchState, screenEvent = screenEvent)
+        SourceScreenSearchContentTags(screenState = screenState, screenEvent = screenEvent)
         SourceScreenSearchSuggestions(screenState = screenState, screenEvent = screenEvent)
     }
 }

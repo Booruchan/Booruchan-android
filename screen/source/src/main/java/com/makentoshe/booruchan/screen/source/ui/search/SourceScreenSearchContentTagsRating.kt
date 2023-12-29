@@ -6,12 +6,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
-import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenSearchState
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenRatingTagContentState
 import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonRow
 
 @Composable
 internal fun SourceScreenSearchContentTagsRating(
-    searchState: SourceScreenSearchState,
+    searchState: SourceScreenRatingTagContentState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) {
     Spacer(modifier = Modifier.size(16.dp))

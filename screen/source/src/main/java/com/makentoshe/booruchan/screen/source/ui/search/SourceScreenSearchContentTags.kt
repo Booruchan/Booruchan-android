@@ -6,10 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,17 +24,17 @@ import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
 internal fun SourceScreenSearchContentTags(
-    searchState: SourceScreenSearchState,
+    screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(
     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
 ) {
     // Show rating tag selector only if there are any tags to select
-    if (searchState.ratingTagSegmentedButtonState.values.isNotEmpty()) {
-        SourceScreenSearchContentTagsRating(searchState = searchState, screenEvent = screenEvent)
+    if (screenState.ratingTagContentState.visible) {
+        SourceScreenSearchContentTagsRating(searchState = screenState.ratingTagContentState, screenEvent = screenEvent)
     }
 
-    SourceScreenSearchContentTagsGeneral(searchState = searchState, screenEvent = screenEvent)
+    SourceScreenSearchContentTagsGeneral(searchState = screenState.searchState, screenEvent = screenEvent)
 }
 
 

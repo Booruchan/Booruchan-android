@@ -15,6 +15,9 @@ data class SourceScreenState(
     val contentState: ContentState,
     val searchState: SourceScreenSearchState,
     val snackbarState: SnackbackState,
+
+    /** State for rating metadata tag */
+    val ratingTagContentState: SourceScreenRatingTagContentState,
 ) {
     companion object {
         val InitialState = SourceScreenState(
@@ -28,8 +31,11 @@ data class SourceScreenState(
                 tags = emptySet(),
                 autocompleteState = AutocompleteState.None,
                 fullScreenState = SourceScreenSearchState.FullScreenState.Collapsed,
-                ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(values = emptyList())
             ),
+            ratingTagContentState = SourceScreenRatingTagContentState(
+                visible = false,
+                ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(values = emptyList())
+            )
         )
     }
 }
@@ -58,16 +64,13 @@ data class SourceScreenSearchState(
     val value: String,
     /** Search example label */
     val label: String,
-    /** All tags that was add to the filter */
+    /** All tags that was add to the filter except rating */
     val tags: Set<TagUiState>,
 
     /** Autocompletion state */
     val autocompleteState: AutocompleteState,
     /** full screen search view state */
     val fullScreenState: FullScreenState,
-
-    /** All values for "rating" metadata tag */
-    val ratingTagSegmentedButtonState: TagsRatingSegmentedButtonState,
 ) {
     val generalTags: List<TagUiState>
         get() = tags.filter { it.type == TagType.General }
@@ -77,6 +80,14 @@ data class SourceScreenSearchState(
         object Collapsed : FullScreenState
     }
 }
+
+@Immutable
+data class SourceScreenRatingTagContentState(
+    /** Is component should be visible */
+    val visible: Boolean,
+    /** All values for "rating" metadata tag */
+    val ratingTagSegmentedButtonState: TagsRatingSegmentedButtonState,
+)
 
 @Immutable
 sealed interface AutocompleteState {

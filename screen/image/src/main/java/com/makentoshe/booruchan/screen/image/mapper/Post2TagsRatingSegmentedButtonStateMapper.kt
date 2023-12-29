@@ -7,6 +7,6 @@ import javax.inject.Inject
 class Post2TagsRatingSegmentedButtonStateMapper @Inject constructor() {
     fun map(post: Post) = TagsRatingSegmentedButtonState(
         values = listOf("Safe", "Questionable", "Explicit"),
-        selected = 0,
+        selected = emptyList()
     )
 }
