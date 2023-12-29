@@ -12,5 +12,6 @@ class Autocomplete2DatabaseTagMapper @Inject constructor() {
         title = autocomplete.title,
         value = autocomplete.value,
         count = autocomplete.count,
+        type = autocomplete.type.name,
     )
 }

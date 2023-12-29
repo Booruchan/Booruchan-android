@@ -14,4 +14,6 @@ data class DatabaseTag(
     val title: String,
     /** Id of the tag. May not be provided for some requests, so it can be empty */
     val id: String,
+    /** Type of the tag */
+    val type: String,
 )
