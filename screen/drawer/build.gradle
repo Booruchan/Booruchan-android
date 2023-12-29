@@ -45,7 +45,6 @@ dependencies {
     implementation project(":library:uikit")
     implementation project(":library:logging")
     implementation project(":library:resources")
-    implementation project(":library:plugin")
 
     implementation project(":screen")
 

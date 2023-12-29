@@ -1,12 +1,16 @@
-package com.makentoshe.booruchan.library.plugin
+package com.makentoshe.booruchan.feature.usecase
 
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import com.makentoshe.booruchan.feature.exception.GetPluginException
+import com.makentoshe.booruchan.feature.exception.GetPluginSourceClassException
+import com.makentoshe.booruchan.feature.entity.Plugin
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dalvik.system.PathClassLoader
 import javax.inject.Inject
+
 
 private const val PLUGIN_SOURCE_CLASS = "org.booruchan.extension.source"
 

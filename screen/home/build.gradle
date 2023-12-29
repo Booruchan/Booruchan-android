@@ -44,7 +44,6 @@ dependencies {
     implementation project(":library:feature")
     implementation project(":library:resources")
     implementation project(":library:logging")
-    implementation project(":library:plugin")
 
     implementation project(":feature")
     implementation project(":feature:healthcheck")

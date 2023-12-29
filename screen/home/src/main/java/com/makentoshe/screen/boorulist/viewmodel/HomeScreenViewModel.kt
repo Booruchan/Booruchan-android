@@ -15,7 +15,7 @@ import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
-import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
+import com.makentoshe.booruchan.feature.usecase.GetAllPluginsUseCase
 import com.makentoshe.screen.boorulist.entity.SourceHealthUi
 import com.makentoshe.screen.boorulist.mapper.Source2SourceUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel

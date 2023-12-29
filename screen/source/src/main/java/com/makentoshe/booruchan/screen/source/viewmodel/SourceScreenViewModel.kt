@@ -27,7 +27,7 @@ import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEntityMapper
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
-import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
+import com.makentoshe.booruchan.feature.usecase.GetAllPluginsUseCase
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper

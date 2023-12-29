@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.library.plugin
+package com.makentoshe.booruchan.feature.entity
 
 data class Plugin(
     val packageName: String,

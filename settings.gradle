@@ -22,7 +22,6 @@ include ':library:feature'
 include ':library:logging'
 include ':library:navigation'
 include ':library:resources'
-include ':library:plugin'
 include ':library:database'
 
 include ':feature'

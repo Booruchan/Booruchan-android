@@ -3,7 +3,7 @@ package com.makentoshe.booruchan.feature.interactor
 import org.booruchan.extension.sdk.Source
 import com.makentoshe.booruchan.feature.EmptySource
 import com.makentoshe.booruchan.feature.PluginFactory
-import com.makentoshe.booruchan.library.plugin.GetAllPluginsUseCase
+import com.makentoshe.booruchan.feature.usecase.GetAllPluginsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject

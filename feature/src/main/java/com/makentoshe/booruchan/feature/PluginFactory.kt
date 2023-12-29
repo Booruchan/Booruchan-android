@@ -1,7 +1,7 @@
 package com.makentoshe.booruchan.feature
 
 import org.booruchan.extension.sdk.Source
-import com.makentoshe.booruchan.library.plugin.Plugin
+import com.makentoshe.booruchan.feature.entity.Plugin
 import javax.inject.Inject
 
 class PluginFactory @Inject constructor() {
