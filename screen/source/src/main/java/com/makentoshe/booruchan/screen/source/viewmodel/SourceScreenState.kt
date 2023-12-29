@@ -1,10 +1,9 @@
 package com.makentoshe.booruchan.screen.source.viewmodel
 
 import androidx.paging.PagingData
+import com.makentoshe.booruchan.screen.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.entity.AutocompleteUiState
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
-import com.makentoshe.booruchan.screen.source.entity.TagType
-import com.makentoshe.booruchan.screen.source.entity.TagUiState
 import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 import kotlinx.coroutines.flow.Flow
 import javax.annotation.concurrent.Immutable
@@ -20,6 +19,8 @@ data class SourceScreenState(
     val ratingTagContentState: SourceScreenRatingTagContentState,
     /** State for all general tags */
     val generalTagsContentState: SourceScreenGeneralTagsContentState,
+    /** State for all character tags */
+    val characterTagsContentState: SourceScreenCharacterTagsContentState,
 ) {
     companion object {
         val InitialState = SourceScreenState(
@@ -40,7 +41,11 @@ data class SourceScreenState(
             generalTagsContentState = SourceScreenGeneralTagsContentState(
                 visible = false,
                 tags = emptySet(),
-            )
+            ),
+            characterTagsContentState = SourceScreenCharacterTagsContentState(
+                visible = false,
+                tags = emptySet(),
+            ),
         )
     }
 }
@@ -93,6 +98,14 @@ data class SourceScreenGeneralTagsContentState(
     /** Is component should be visible */
     val visible: Boolean,
     /** All general tags that was added to the filter */
+    val tags: Set<TagUiState>,
+)
+
+@Immutable
+data class SourceScreenCharacterTagsContentState(
+    /** Is component should be visible */
+    val visible: Boolean,
+    /** All character tags that was added to the filter */
     val tags: Set<TagUiState>,
 )
 

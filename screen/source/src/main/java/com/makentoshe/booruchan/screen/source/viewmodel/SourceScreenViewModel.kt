@@ -9,8 +9,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.makentoshe.booruchan.feature.EmptySource
+import com.makentoshe.booruchan.feature.entity.TagType
 import com.makentoshe.booruchan.feature.interactor.AutocompleteInteractor
 import com.makentoshe.booruchan.feature.interactor.PluginInteractor
+import com.makentoshe.booruchan.feature.usecase.GetTagByValueUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultEventDelegate
@@ -23,9 +25,10 @@ import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEnt
 import com.makentoshe.booruchan.library.logging.internalLogError
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
-import com.makentoshe.booruchan.screen.source.entity.TagType
-import com.makentoshe.booruchan.screen.source.entity.TagUiState
+import com.makentoshe.booruchan.screen.entity.TagTypeUiState
+import com.makentoshe.booruchan.screen.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
+import com.makentoshe.booruchan.screen.source.mapper.Tag2TagUiStateMapper
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
 import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,7 +45,10 @@ class SourceScreenViewModel @Inject constructor(
     private val pluginInteractor: PluginInteractor,
     private val autocompleteInteractor: AutocompleteInteractor,
 
+    private val getTagByValue: GetTagByValueUseCase,
+
     private val pagingSourceFactory: PagingSourceFactory,
+    private val tag2TagUiStateMapper: Tag2TagUiStateMapper,
     private val autocompleteUiStateMapper: Autocomplete2AutocompleteUiStateMapper,
     private val throwable2ThrowableEntityMapper: Throwable2ThrowableEntityMapper,
 ) : ViewModel(), CoroutineDelegate by DefaultCoroutineDelegate(),
@@ -81,6 +87,10 @@ class SourceScreenViewModel @Inject constructor(
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) {
+        if (pluginInteractor.sourceFlow.value !is EmptySource) {
+            return // skip initialization if source already defined
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             internalLogInfo("invoke initialize for Source(${event.sourceId})")
             // store arguments in the state
@@ -120,8 +130,7 @@ class SourceScreenViewModel @Inject constructor(
         updateState {
             copy(
                 ratingTagContentState = SourceScreenRatingTagContentState(
-                    visible = false,
-                    ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(
+                    visible = false, ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(
                         values = ratingTagValues,
                     )
                 )
@@ -214,24 +223,42 @@ class SourceScreenViewModel @Inject constructor(
     }
 
     private fun searchAddTag(event: SourceScreenEvent.SearchTagAdd) {
+        val source = pluginInteractor.sourceFlow.value
         viewModelScope.launch(Dispatchers.IO) {
             internalLogInfo("invoke search add tag: ${event.tag}")
             // skip any blank input: we're not interested in it
             if (event.tag.isBlank()) return@launch internalLogInfo("skip add tag: ${event.tag}")
-            // General is a default type for tag
-            val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
+            // Get tag info from database to try to define type
+            val tag = getTagByValue(source.id, event.tag)
+                ?: getTagByValue(event.tag).firstOrNull { it.type != TagType.Other }
+            // Create ui state for tag
+            val tagUiState = tag?.let(tag2TagUiStateMapper::map)
+                ?: TagUiState(tag = event.tag, type = TagTypeUiState.General)
             // Append new tag to current tags, hide autocompletion and clear input field
             updateState {
-                copy(
-                    searchState = searchState.copy(
-                        value = "",
-                        autocompleteState = AutocompleteState.None
-                    ),
-                    generalTagsContentState = generalTagsContentState.copy(
-                        visible = true,
-                        tags = generalTagsContentState.tags.plus(tagUiState)
+                copy(searchState = searchState.copy(value = "", autocompleteState = AutocompleteState.None))
+            }
+
+            when (tagUiState.type) {
+                TagTypeUiState.General, TagTypeUiState.Other -> updateState {
+                    copy(
+                        generalTagsContentState = generalTagsContentState.copy(
+                            visible = true, tags = generalTagsContentState.tags.plus(tagUiState),
+                        ),
                     )
-                )
+                }
+
+                TagTypeUiState.Artist -> Unit
+                TagTypeUiState.Character -> updateState {
+                    copy(
+                        characterTagsContentState = characterTagsContentState.copy(
+                            visible = true, tags = characterTagsContentState.tags.plus(tagUiState),
+                        ),
+                    )
+                }
+
+                TagTypeUiState.Copyright -> Unit
+                TagTypeUiState.Metadata -> Unit
             }
         }
     }
@@ -241,8 +268,8 @@ class SourceScreenViewModel @Inject constructor(
 
         internalLogInfo("invoke change rating tag")
 
-        val ratingTagSettings = source.settings.ratingTagSettings
-            ?: return internalLogError("Settings for \"rating\" tag were not define")
+        val ratingTagSettings =
+            source.settings.ratingTagSettings ?: return internalLogError("Settings for \"rating\" tag were not define")
 
         // Get current selections list
         val selected = state.ratingTagContentState.ratingTagSegmentedButtonState.selected.toMutableList()
@@ -273,23 +300,21 @@ class SourceScreenViewModel @Inject constructor(
             },
         ) {
             val source = pluginInteractor.sourceFlow.value
-
-            if (source is EmptySource) {
-                return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
-            }
+            if (source is EmptySource) return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
 
             val generalTags = state.generalTagsContentState.tags
+            val characterTags = state.characterTagsContentState.tags
 
-            internalLogInfo("invoke apply filters event: $generalTags")
+            internalLogInfo("invoke apply filters event: ${generalTags + characterTags}")
 
             // get fetch posts factory or show failure state
             val fetchPostsFactory = source.fetchPostsFactory
                 ?: return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
-            val generalTagsQuery = generalTags.joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
+            val tagsQuery = (generalTags + characterTags).joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
 
             val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
-                pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, generalTagsQuery)
+                pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, tagsQuery)
             }.flow.cachedIn(viewModelScope)
 
             updateState {
@@ -309,8 +334,20 @@ class SourceScreenViewModel @Inject constructor(
                 return@launch updateState {
                     copy(
                         generalTagsContentState = generalTagsContentState.copy(
-                            visible = newGeneralTags.isNotEmpty(),
-                            tags = newGeneralTags
+                            visible = newGeneralTags.isNotEmpty(), tags = newGeneralTags,
+                        )
+                    )
+                }
+            }
+
+            // Remove from character tags
+            val characterTag = state.characterTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            if (characterTag != null) {
+                val newCharacterTags = state.characterTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                return@launch updateState {
+                    copy(
+                        characterTagsContentState = characterTagsContentState.copy(
+                            visible = newCharacterTags.isNotEmpty(), tags = newCharacterTags,
                         )
                     )
                 }
@@ -353,8 +390,7 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun pluginFetchPostFactoryNullContentState(): ContentState.Failure {
         return ContentState.Failure(
-            title = "There is an plugin error",
-            description = "Could not determine FetchPostFactory for this Source"
+            title = "There is an plugin error", description = "Could not determine FetchPostFactory for this Source"
         )
     }
 
