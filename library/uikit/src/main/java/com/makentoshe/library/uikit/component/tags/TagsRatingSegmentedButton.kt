@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
+import androidx.compose.material3.MultiChoiceSegmentedButtonRowScope
 import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.SingleChoiceSegmentedButtonRowScope
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,8 +21,9 @@ import com.makentoshe.library.uikit.theme.BooruchanTheme
 fun TagsRatingSegmentedButtonRow(
     state: TagsRatingSegmentedButtonState,
     enabled: Boolean = true,
-    onClick: (Int) -> Unit,
+    onClick: (Int, Boolean) -> Unit,
 ) = Column {
+
     SmallText(
         text = stringResource(id = R.string.source_search_tag_rating),
         color = BooruchanTheme.colors.foreground,
@@ -31,7 +31,7 @@ fun TagsRatingSegmentedButtonRow(
 
     Spacer(modifier = Modifier.size(8.dp))
 
-    SingleChoiceSegmentedButtonRow {
+    MultiChoiceSegmentedButtonRow {
         state.values.forEachIndexed { index, value ->
             var shape = RoundedCornerShape(0.dp)
 
@@ -43,28 +43,29 @@ fun TagsRatingSegmentedButtonRow(
                 shape = shape.copy(topEnd = CornerSize(8.dp), bottomEnd = CornerSize(8.dp))
             }
 
-            SegmentedButton2(
+            TagsRatingSegmentedButton(
                 value = value,
-                onClick = { onClick(index) },
+                onClick = { onClick(index, it) },
                 shape = shape,
-                selected = index == state.selected,
+                enabled = enabled,
+                checked = state.selected.contains(index),
             )
         }
     }
 }
 
 @Composable
-fun SingleChoiceSegmentedButtonRowScope.SegmentedButton2(
+fun MultiChoiceSegmentedButtonRowScope.TagsRatingSegmentedButton(
     value: String,
-    onClick: () -> Unit,
-    selected: Boolean = false,
+    onClick: (Boolean) -> Unit,
+    checked: Boolean = false,
     enabled: Boolean = true,
     shape: RoundedCornerShape = RoundedCornerShape(0.dp),
 ) = SegmentedButton(
-    selected = selected,
-    onClick = onClick,
+    checked = checked,
+    onCheckedChange = onClick,
     shape = shape,
     enabled = enabled,
     icon = {},
-    label = { Text(value) },
+    label = { SecondaryText(value) },
 )

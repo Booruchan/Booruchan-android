@@ -62,17 +62,23 @@ class SourceScreenViewModel @Inject constructor(
 
     override fun handleEvent(event: SourceScreenEvent) = when (event) {
         is SourceScreenEvent.Initialize -> initialize(event)
+        // Navigation events
         is SourceScreenEvent.NavigationBack -> navigationBack()
         is SourceScreenEvent.NavigationImage -> navigationImage(event)
+
         is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
+        is SourceScreenEvent.SearchTagChangeRating -> searchChangeTagRating(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
         is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
         is SourceScreenEvent.StoreSourceSearch -> storeSourceSearch()
+
         SourceScreenEvent.ShowSearch -> showSearchViaFullScreen()
         SourceScreenEvent.DismissSearch -> dismissSearchViaFullScreen()
+
         is SourceScreenEvent.ShowSnackbar -> showErrorViaSnackbar(event)
         SourceScreenEvent.DismissSnackbar -> dismissSnackbar()
+
         is SourceScreenEvent.SuggestedItemClicked -> suggestedItemClicked(event)
     }
 
@@ -90,8 +96,18 @@ class SourceScreenViewModel @Inject constructor(
     private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
         if (source is EmptySource) return@launch
-        // Show source title
-        updateState { copy(sourceTitle = source.title) }
+
+        // Show source title and update rating meta tag values
+        updateState {
+            copy(
+                sourceTitle = source.title,
+                searchState = searchState.copy(
+                    ratingTagSegmentedButtonState = searchState.ratingTagSegmentedButtonState.copy(
+                        values = source.settings.ratingTagSettings?.values ?: emptyList(),
+                    )
+                )
+            )
+        }
 
         // get fetch posts factory or show failure state
         val fetchPostsFactory = source.fetchPostsFactory
@@ -210,6 +226,63 @@ class SourceScreenViewModel @Inject constructor(
         }
     }
 
+    private fun searchChangeTagRating(event: SourceScreenEvent.SearchTagChangeRating) {
+        internalLogInfo("invoke change rating tag: ${event.index}")
+
+        // Get current selections list
+        val selected = state.searchState.ratingTagSegmentedButtonState.selected.toMutableList()
+
+        // Change selection
+        if (selected.contains(event.index)) {
+            selected.remove(event.index)
+        } else {
+            selected.add(event.index)
+        }
+
+
+//        // General is a default type for tag
+//        val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
+//        // Append new tag to current tags, hide autocompletion and clear input field
+//        updateState {
+//            copy(
+//                searchState = searchState.copy(
+//                    value = "",
+//                    tags = searchState.tags.plus(tagUiState),
+//                    autocompleteState = AutocompleteState.None
+//                ),
+//            )
+//        }
+//        searchAddTag()
+
+        // Update selection
+        updateState {
+            copy(
+                searchState = searchState.copy(
+                    ratingTagSegmentedButtonState = searchState.ratingTagSegmentedButtonState.copy(
+                        selected = selected,
+                    )
+                )
+            )
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+//            // skip any blank input: we're not interested in it
+//            if (event.tag.isBlank()) return@launch internalLogInfo("skip add tag: ${event.tag}")
+//            // General is a default type for tag
+//            val tagUiState = TagUiState(tag = event.tag, type = TagType.General)
+//            // Append new tag to current tags, hide autocompletion and clear input field
+//            updateState {
+//                copy(
+//                    searchState = searchState.copy(
+//                        value = "",
+//                        tags = searchState.tags.plus(tagUiState),
+//                        autocompleteState = AutocompleteState.None
+//                    ),
+//                )
+//            }
+        }
+    }
+
     private fun storeSourceSearch() {
         viewModelScope.launch(Dispatchers.IO) {
             val source = pluginInteractor.sourceFlow.value
@@ -278,11 +351,11 @@ class SourceScreenViewModel @Inject constructor(
     }
 
     private fun showSearchViaFullScreen() {
-        updateState { copy(searchState = searchState.copy(fullScreenState = SearchState.FullScreenState.Expanded)) }
+        updateState { copy(searchState = searchState.copy(fullScreenState = SourceScreenSearchState.FullScreenState.Expanded)) }
     }
 
     private fun dismissSearchViaFullScreen() {
-        updateState { copy(searchState = searchState.copy(fullScreenState = SearchState.FullScreenState.Collapsed)) }
+        updateState { copy(searchState = searchState.copy(fullScreenState = SourceScreenSearchState.FullScreenState.Collapsed)) }
     }
 
     private fun failureContentState(throwable: Throwable): ContentState.Failure {

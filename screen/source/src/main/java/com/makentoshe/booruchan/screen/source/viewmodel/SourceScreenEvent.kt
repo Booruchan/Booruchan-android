@@ -8,31 +8,34 @@ sealed interface SourceScreenEvent {
     object NavigationBack : SourceScreenEvent
 
     /** Navigates forward to the fullscreen image screen */
-    data class NavigationImage(val id: String): SourceScreenEvent
+    data class NavigationImage(val id: String) : SourceScreenEvent
 
     /** Shows error using snackbar */
-    data class ShowSnackbar(val throwable: Throwable): SourceScreenEvent
+    data class ShowSnackbar(val throwable: Throwable) : SourceScreenEvent
 
     /** Dismiss any snackbar */
-    object DismissSnackbar: SourceScreenEvent
+    object DismissSnackbar : SourceScreenEvent
 
     /** Shows a simple search view above the content */
-    object ShowSearch: SourceScreenEvent
+    object ShowSearch : SourceScreenEvent
 
     /** Dismiss search view above the content */
-    object DismissSearch: SourceScreenEvent
+    object DismissSearch : SourceScreenEvent
 
     /** Stores current search in navigation storage. We can return to this screen state lately */
     object StoreSourceSearch : SourceScreenEvent
 
     /** Invokes on each symbol input from the keyboard */
-    data class SearchValueChange(val value: String): SourceScreenEvent
+    data class SearchValueChange(val value: String) : SourceScreenEvent
 
-    data class SuggestedItemClicked(val value: String): SourceScreenEvent
+    data class SuggestedItemClicked(val value: String) : SourceScreenEvent
 
-    data class SearchTagAdd(val tag: String): SourceScreenEvent
+    data class SearchTagAdd(val tag: String) : SourceScreenEvent
 
-    data class SearchTagRemove(val tag: String): SourceScreenEvent
+    data class SearchTagRemove(val tag: String) : SourceScreenEvent
 
-    object SearchApplyFilters: SourceScreenEvent
+    /** Add rating meta tag by its index */
+    data class SearchTagChangeRating(val index: Int) : SourceScreenEvent
+
+    object SearchApplyFilters : SourceScreenEvent
 }

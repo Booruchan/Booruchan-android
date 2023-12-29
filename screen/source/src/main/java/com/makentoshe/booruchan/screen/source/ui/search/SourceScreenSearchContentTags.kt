@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.library.resources.R
 import com.makentoshe.booruchan.screen.source.ui.components.chip.ChipItem
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenSearchState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.ChipGroup
 import com.makentoshe.library.uikit.foundation.SecondaryText
@@ -27,64 +28,27 @@ import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
 internal fun SourceScreenSearchContentTags(
-    screenState: SourceScreenState,
+    searchState: SourceScreenSearchState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(
     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
 ) {
-//    SourceScreenSearchContentTagsRating(screenState = screenState, screenEvent = screenEvent)
-    SourceScreenSearchContentTagsGeneral(screenState = screenState, screenEvent = screenEvent)
-}
-
-@Composable
-private fun SourceScreenSearchContentTagsRating(
-    screenState: SourceScreenState,
-    screenEvent: (SourceScreenEvent) -> Unit,
-) {
-    Spacer(modifier = Modifier.size(16.dp))
-
-    SecondaryText(
-        text = stringResource(id = R.string.source_search_tag_rating),
-        color = BooruchanTheme.colors.foreground,
-    )
-
-    Spacer(modifier = Modifier.size(8.dp))
-
-    SingleChoiceSegmentedButtonRow {
-        SegmentedButton(
-            selected = false,
-            onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
-            icon = {},
-        ) {
-            Text("Safe")
-        }
-        SegmentedButton(
-            selected = false,
-            onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(0.dp),
-            icon = {},
-        ) {
-            Text("Questionable")
-        }
-        SegmentedButton(
-            selected = false,
-            onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
-            icon = {},
-        ) {
-            Text("Explicit")
-        }
+    // Show rating tag selector only if there are any tags to select
+    if (searchState.ratingTagSegmentedButtonState.values.isNotEmpty()) {
+        SourceScreenSearchContentTagsRating(searchState = searchState, screenEvent = screenEvent)
     }
+
+    SourceScreenSearchContentTagsGeneral(searchState = searchState, screenEvent = screenEvent)
 }
+
 
 @Composable
 private fun SourceScreenSearchContentTagsGeneral(
-    screenState: SourceScreenState,
+    searchState: SourceScreenSearchState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) {
-    val generalTags by remember(key1 = screenState.searchState) {
-        mutableStateOf(screenState.searchState.generalTags)
+    val generalTags by remember(key1 = searchState) {
+        mutableStateOf(searchState.generalTags)
     }
 
     if (generalTags.isNotEmpty()) {

@@ -15,7 +15,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntSize
-import com.makentoshe.booruchan.screen.source.viewmodel.SearchState
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenSearchState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 
@@ -28,23 +28,23 @@ internal fun SourceScreenSearch(
     label = "label",
     transitionSpec = { sourceScreenSearchTransition() },
     content = {
-        BackHandler(enabled = it is SearchState.FullScreenState.Expanded) {
+        BackHandler(enabled = it is SourceScreenSearchState.FullScreenState.Expanded) {
             screenEvent(SourceScreenEvent.DismissSearch)
         }
 
-        if (it is SearchState.FullScreenState.Expanded) {
+        if (it is SourceScreenSearchState.FullScreenState.Expanded) {
             SourceScreenSearchContent(screenState = screenState, screenEvent = screenEvent)
         }
     }
 )
 
-private fun AnimatedContentTransitionScope<SearchState.FullScreenState>.sourceScreenSearchTransition(): ContentTransform {
+private fun AnimatedContentTransitionScope<SourceScreenSearchState.FullScreenState>.sourceScreenSearchTransition(): ContentTransform {
     return sourceScreenSearchFadeIn() togetherWith sourceScreenSearchFadeOut() using sourceScreenSearchSizeTransform()
 }
 
-private fun AnimatedContentTransitionScope<SearchState.FullScreenState>.sourceScreenSearchSizeTransform(): SizeTransform {
+private fun AnimatedContentTransitionScope<SourceScreenSearchState.FullScreenState>.sourceScreenSearchSizeTransform(): SizeTransform {
     return SizeTransform { initialSize, targetSize ->
-        if (targetState is SearchState.FullScreenState.Expanded) {
+        if (targetState is SourceScreenSearchState.FullScreenState.Expanded) {
             keyframes {
                 // Expand horizontally first.
                 IntSize(targetSize.width, initialSize.height) at 150

@@ -1,14 +1,11 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class)
-
 package com.makentoshe.booruchan.screen.source.viewmodel
 
-import androidx.compose.material.BackdropValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.paging.PagingData
 import com.makentoshe.booruchan.screen.source.entity.AutocompleteUiState
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
 import com.makentoshe.booruchan.screen.source.entity.TagType
 import com.makentoshe.booruchan.screen.source.entity.TagUiState
+import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
 import kotlinx.coroutines.flow.Flow
 import javax.annotation.concurrent.Immutable
 
@@ -16,7 +13,7 @@ data class SourceScreenState(
     val sourceId: String,
     val sourceTitle: String,
     val contentState: ContentState,
-    val searchState: SearchState,
+    val searchState: SourceScreenSearchState,
     val snackbarState: SnackbackState,
 ) {
     companion object {
@@ -25,12 +22,13 @@ data class SourceScreenState(
             sourceTitle = "",
             contentState = ContentState.Loading,
             snackbarState = SnackbackState.None,
-            searchState = SearchState(
+            searchState = SourceScreenSearchState(
                 value = "",
                 label = "Ex: blue_sky cloud 1girl",
                 tags = emptySet(),
                 autocompleteState = AutocompleteState.None,
-                fullScreenState = SearchState.FullScreenState.Collapsed
+                fullScreenState = SourceScreenSearchState.FullScreenState.Collapsed,
+                ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(values = emptyList())
             ),
         )
     }
@@ -55,24 +53,28 @@ sealed interface ContentState {
 }
 
 @Immutable
-data class SearchState(
+data class SourceScreenSearchState(
     /** TextField value */
     val value: String,
     /** Search example label */
     val label: String,
     /** All tags that was add to the filter */
     val tags: Set<TagUiState>,
+
     /** Autocompletion state */
     val autocompleteState: AutocompleteState,
     /** full screen search view state */
     val fullScreenState: FullScreenState,
+
+    /** All values for "rating" metadata tag */
+    val ratingTagSegmentedButtonState: TagsRatingSegmentedButtonState,
 ) {
     val generalTags: List<TagUiState>
         get() = tags.filter { it.type == TagType.General }
 
     sealed interface FullScreenState {
-        object Expanded: FullScreenState
-        object Collapsed: FullScreenState
+        object Expanded : FullScreenState
+        object Collapsed : FullScreenState
     }
 }
 
@@ -93,7 +95,7 @@ sealed interface AutocompleteState {
 
 @Immutable
 sealed interface SnackbackState {
-    object None: SnackbackState
+    object None : SnackbackState
 
-    data class Content(val message: String): SnackbackState
+    data class Content(val message: String) : SnackbackState
 }
