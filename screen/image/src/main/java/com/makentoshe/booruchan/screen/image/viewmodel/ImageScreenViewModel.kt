@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import org.booruchan.extension.sdk.Source
 import com.makentoshe.booruchan.feature.EmptySource
-import com.makentoshe.booruchan.feature.interactor.SourceInteractor
+import com.makentoshe.booruchan.feature.interactor.PluginInteractor
 import com.makentoshe.booruchan.feature.usecase.GetPostByIdUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
 import com.makentoshe.booruchan.library.feature.DefaultCoroutineDelegate
@@ -27,7 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ImageScreenViewModel @Inject constructor(
-    private val sourceInteractor: SourceInteractor,
+    private val pluginInteractor: PluginInteractor,
 
     private val getPost: GetPostByIdUseCase,
 
@@ -42,7 +42,7 @@ class ImageScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            sourceInteractor.sourceFlow.collectLatest(::onSource)
+            pluginInteractor.sourceFlow.collectLatest(::onSource)
         }
     }
 
@@ -57,7 +57,7 @@ class ImageScreenViewModel @Inject constructor(
         // store arguments in the state
         updateState { copy(sourceId = event.sourceId, postId = event.postId) }
         // getting source by id or null
-        sourceInteractor.getSourceById(event.sourceId)
+        pluginInteractor.getSourceById(event.sourceId)
             ?: return@iolaunch updateState { copy(contentState = pluginSourceNullContentState()) }
     }
 

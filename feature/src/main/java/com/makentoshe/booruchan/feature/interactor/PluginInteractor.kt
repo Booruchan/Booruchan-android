@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 typealias SourceId = String
 
-class SourceInteractor @Inject constructor(
+class PluginInteractor @Inject constructor(
     private val pluginFactory: PluginFactory,
     private val findAllPlugins: GetAllPluginsUseCase,
 ) {
