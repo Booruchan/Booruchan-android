@@ -22,21 +22,22 @@ import com.makentoshe.booruchan.library.feature.EventDelegate
 import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEntityMapper
-import com.makentoshe.booruchan.library.logging.internalLogError
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
-import com.makentoshe.library.uikit.entity.TagTypeUiState
-import com.makentoshe.library.uikit.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
 import com.makentoshe.booruchan.screen.source.mapper.Tag2TagUiStateMapper
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
+import com.makentoshe.library.uikit.component.rating.RatingComponentState
 import com.makentoshe.library.uikit.component.rating.RatingSegmentedButtonState
+import com.makentoshe.library.uikit.entity.TagTypeUiState
+import com.makentoshe.library.uikit.entity.TagUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.booruchan.extension.sdk.Source
+import org.booruchan.extension.sdk.factory.FetchPostsFactory
 import org.booruchan.extension.sdk.settings.SourceSearchSettings
 import javax.inject.Inject
 
@@ -75,7 +76,7 @@ class SourceScreenViewModel @Inject constructor(
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
         is SourceScreenEvent.SearchTagChangeRating -> searchChangeTagRating(event)
-        is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
+        is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters(event)
 
         SourceScreenEvent.ShowSearch -> showSearchViaFullScreen()
         SourceScreenEvent.DismissSearch -> dismissSearchViaFullScreen()
@@ -87,17 +88,23 @@ class SourceScreenViewModel @Inject constructor(
     }
 
     private fun initialize(event: SourceScreenEvent.Initialize) {
+        // Skip logging here due frequent event invocation due recompositions
         if (pluginInteractor.sourceFlow.value !is EmptySource) {
             return // skip initialization if source already defined
         }
 
+        internalLogInfo("invoke event: $event")
+
+        // store arguments in the state
+        updateState { copy(sourceId = event.sourceId) }
+
+        // getting source by id or null
         viewModelScope.launch(Dispatchers.IO) {
-            internalLogInfo("invoke initialize for Source(${event.sourceId})")
-            // store arguments in the state
-            updateState { copy(sourceId = event.sourceId) }
-            // getting source by id or null
-            pluginInteractor.getSourceById(event.sourceId)
-                ?: return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
+            val source = pluginInteractor.getSourceById(event.sourceId)
+            if (source == null) {
+                internalLogWarn("abandon event: source is null")
+                return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
+            }
         }
     }
 
@@ -128,14 +135,20 @@ class SourceScreenViewModel @Inject constructor(
     }
 
     private fun onSourceRatingTagContent(source: Source) {
+        val ratingTagSettings = source.settings.ratingTagSettings
+        if (ratingTagSettings == null) {
+            return internalLogWarn("OnSource: settings for \"rating\" tag were not define")
+        }
+
         // Get first 3 rating tag values (we could not handle more than 3 yet)
-        val ratingTagValues = (source.settings.ratingTagSettings?.values ?: emptyList()).subList(0, 3)
+        val ratingTagValues = ratingTagSettings.values.take(3)
+        internalLogInfo("OnSource: rating values $ratingTagValues")
 
         // Show rating tag content state
         updateState {
             copy(
-                ratingTagContentState = SourceScreenRatingTagContentState(
-                    visible = false, ratingTagSegmentedButtonState = RatingSegmentedButtonState(
+                ratingComponentState = RatingComponentState(
+                    visible = true, ratingTagSegmentedButtonState = RatingSegmentedButtonState(
                         values = ratingTagValues,
                     )
                 )
@@ -299,15 +312,20 @@ class SourceScreenViewModel @Inject constructor(
     }
 
     private fun searchChangeTagRating(event: SourceScreenEvent.SearchTagChangeRating) {
+        internalLogInfo("invoke event: $event")
         val source = pluginInteractor.sourceFlow.value
+        if (source is EmptySource) {
+            return internalLogWarn("abandon event: source is empty")
+        }
 
-        internalLogInfo("invoke change rating tag")
-
-        val ratingTagSettings =
-            source.settings.ratingTagSettings ?: return internalLogError("Settings for \"rating\" tag were not define")
+        val ratingTagSettings = source.settings.ratingTagSettings
+        if (ratingTagSettings == null) {
+            return internalLogWarn("abandon event: settings for \"rating\" tag were not define")
+        }
 
         // Get current selections list
-        val selected = state.ratingTagContentState.ratingTagSegmentedButtonState.selected.toMutableList()
+        val selected = state.ratingComponentState.ratingTagSegmentedButtonState.selected.toMutableList()
+        internalLogInfo("continue event: current selections indexes: $selected")
 
         // Change selection
         if (selected.contains(event.index)) {
@@ -316,11 +334,13 @@ class SourceScreenViewModel @Inject constructor(
             selected.add(event.index)
         }
 
+        internalLogInfo("continue event: new selections indexes: $selected")
+
         // Update selection state
         updateState {
             copy(
-                ratingTagContentState = ratingTagContentState.copy(
-                    ratingTagSegmentedButtonState = ratingTagContentState.ratingTagSegmentedButtonState.copy(
+                ratingComponentState = ratingComponentState.copy(
+                    ratingTagSegmentedButtonState = ratingComponentState.ratingTagSegmentedButtonState.copy(
                         selected = selected,
                     )
                 ),
@@ -328,39 +348,90 @@ class SourceScreenViewModel @Inject constructor(
         }
     }
 
-    private fun searchApplyFilters() {
+    private fun searchApplyFilters(event: SourceScreenEvent.SearchApplyFilters) {
         viewModelScope.launch(
             context = Dispatchers.IO + CoroutineExceptionHandler { _, throwable ->
                 updateState { copy(contentState = failureContentState(throwable)) }
             },
         ) {
-            internalLogInfo("invoke apply filters event")
+            internalLogInfo("invoke event: $event")
 
+            // get source or show failure state
             val source = pluginInteractor.sourceFlow.value
-            if (source is EmptySource) return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
+            if (source is EmptySource) {
+                internalLogWarn("abandon event: source is empty")
+                return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
+            }
 
             // get fetch posts factory or show failure state
             val fetchPostsFactory = source.fetchPostsFactory
-                ?: return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
-
-            // Collect tags from groups
-            val generalTags = state.tagsComponentState.generalTagsContentState.tags
-            val characterTags = state.tagsComponentState.characterTagsContentState.tags
-            val artistTags = state.tagsComponentState.artistTagsContentState.tags
-            val copyrightTags = state.tagsComponentState.copyrightTagsContentState.tags
-            val metadataTags = state.tagsComponentState.metadataTagsContentState.tags
-
-            // Join all tags together
-            val tagsQuery =
-                (generalTags + characterTags + artistTags + copyrightTags + metadataTags).joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
-
-            val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
-                pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, tagsQuery)
-            }.flow.cachedIn(viewModelScope)
-
-            updateState {
-                copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
+            if (fetchPostsFactory == null) {
+                internalLogWarn("abandon event: fetch posts factory is null")
+                return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
             }
+
+            searchApplyFilters(source, fetchPostsFactory)
+        }
+    }
+
+    private fun searchApplyFilters(source: Source, fetchPostsFactory: FetchPostsFactory) {
+        val ratingTagSettings = source.settings.ratingTagSettings
+        val ratingTag = if (ratingTagSettings != null) {
+            val selectedRatingState = state.ratingComponentState.ratingTagSegmentedButtonState.selected
+
+            when (selectedRatingState.count()) {
+                0, 3 -> {
+                    emptySet()
+                }
+
+                1 -> {
+                    val tagValue = ratingTagSettings.values[selectedRatingState.first()]
+                    val tag = ratingTagSettings.name + ratingTagSettings.tagKeyValueSeparator + tagValue
+
+                    setOf(TagUiState(tag = tag, type = TagTypeUiState.Other))
+                }
+
+                2 -> {
+                    val tagValue = ratingTagSettings.values.filterIndexed { index, _ ->
+                        !selectedRatingState.contains(index)
+                    }.first()
+
+                    val not = source.settings.searchSettings.searchTagNot
+                    val tag = not + ratingTagSettings.name + ratingTagSettings.tagKeyValueSeparator + tagValue
+
+                    setOf(TagUiState(tag = tag, type = TagTypeUiState.Other))
+                }
+
+                else -> {
+                    internalLogWarn("continue event: skip rating tag: unsupported count of selected rating items")
+
+                    emptySet()
+                }
+            }
+        } else {
+            emptySet()
+        }
+
+        // Collect tags from groups
+        val generalTags = state.tagsComponentState.generalTagsContentState.tags
+        val characterTags = state.tagsComponentState.characterTagsContentState.tags
+        val artistTags = state.tagsComponentState.artistTagsContentState.tags
+        val copyrightTags = state.tagsComponentState.copyrightTagsContentState.tags
+        val metadataTags = state.tagsComponentState.metadataTagsContentState.tags
+
+        val joinedTags = generalTags + characterTags + artistTags + copyrightTags + metadataTags + ratingTag
+        internalLogWarn("continue event: joined tags from groups $joinedTags")
+
+        // Join all tags together
+        val tagsQuery = joinedTags.joinToString(source.settings.searchSettings.searchTagAnd) { it.tag }
+        internalLogWarn("continue event: tags query: $tagsQuery")
+
+        val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
+            pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, tagsQuery)
+        }.flow.cachedIn(viewModelScope)
+
+        updateState {
+            copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
         }
     }
 

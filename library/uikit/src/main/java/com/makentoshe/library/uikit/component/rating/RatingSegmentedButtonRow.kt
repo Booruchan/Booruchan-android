@@ -20,9 +20,10 @@ import com.makentoshe.library.uikit.theme.BooruchanTheme
 @Composable
 fun RatingSegmentedButtonRow(
     state: RatingSegmentedButtonState,
-    enabled: Boolean = true,
     onClick: (Int, Boolean) -> Unit,
-) = Column {
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) = Column(modifier = modifier) {
 
     SmallText(
         text = stringResource(id = R.string.source_search_tag_rating),

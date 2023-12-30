@@ -8,7 +8,7 @@ import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
-internal fun ChipItem(
+internal fun TagChipItem(
     state: TagUiState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = CloseChipItem(

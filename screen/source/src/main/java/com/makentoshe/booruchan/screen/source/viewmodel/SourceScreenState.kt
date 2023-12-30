@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import com.makentoshe.library.uikit.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.entity.AutocompleteUiState
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
+import com.makentoshe.library.uikit.component.rating.RatingComponentState
 import com.makentoshe.library.uikit.component.rating.RatingSegmentedButtonState
 import com.makentoshe.library.uikit.component.tags.TagsComponentState
 import com.makentoshe.library.uikit.component.tags.TagsContentState
@@ -17,9 +18,7 @@ data class SourceScreenState(
     val searchState: SourceScreenSearchState,
     val snackbarState: SnackbackState,
 
-    /** State for rating metadata tag */
-    val ratingTagContentState: SourceScreenRatingTagContentState,
-
+    val ratingComponentState: RatingComponentState,
     val tagsComponentState: TagsComponentState,
 ) {
     companion object {
@@ -34,7 +33,7 @@ data class SourceScreenState(
                 autocompleteState = AutocompleteState.None,
                 fullScreenState = SourceScreenSearchState.FullScreenState.Collapsed,
             ),
-            ratingTagContentState = SourceScreenRatingTagContentState(
+            ratingComponentState = RatingComponentState(
                 visible = false,
                 ratingTagSegmentedButtonState = RatingSegmentedButtonState(values = emptyList())
             ),
