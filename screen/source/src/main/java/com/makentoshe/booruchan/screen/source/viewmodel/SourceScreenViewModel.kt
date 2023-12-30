@@ -228,17 +228,25 @@ class SourceScreenViewModel @Inject constructor(
             internalLogInfo("invoke search add tag: ${event.tag}")
             // skip any blank input: we're not interested in it
             if (event.tag.isBlank()) return@launch internalLogInfo("skip add tag: ${event.tag}")
+
             // Get tag info from database to try to define type
-            val tag = getTagByValue(source.id, event.tag)
-                ?: getTagByValue(event.tag).firstOrNull { it.type != TagType.Other }
+            val sourceTag = getTagByValue(source.id, event.tag)
+            val tag = if (sourceTag != null && sourceTag.type != TagType.Other) {
+                sourceTag
+            } else {
+                getTagByValue(event.tag).firstOrNull { it.type != TagType.Other }
+            }
+
             // Create ui state for tag
             val tagUiState = tag?.let(tag2TagUiStateMapper::map)
                 ?: TagUiState(tag = event.tag, type = TagTypeUiState.General)
+
             // Append new tag to current tags, hide autocompletion and clear input field
             updateState {
                 copy(searchState = searchState.copy(value = "", autocompleteState = AutocompleteState.None))
             }
 
+            // Add tag to the specific content
             when (tagUiState.type) {
                 TagTypeUiState.General, TagTypeUiState.Other -> updateState {
                     copy(
@@ -248,7 +256,14 @@ class SourceScreenViewModel @Inject constructor(
                     )
                 }
 
-                TagTypeUiState.Artist -> Unit
+                TagTypeUiState.Artist -> updateState {
+                    copy(
+                        artistTagsContentState = artistTagsContentState.copy(
+                            visible = true, tags = artistTagsContentState.tags.plus(tagUiState),
+                        ),
+                    )
+                }
+
                 TagTypeUiState.Character -> updateState {
                     copy(
                         characterTagsContentState = characterTagsContentState.copy(
@@ -335,6 +350,19 @@ class SourceScreenViewModel @Inject constructor(
                     copy(
                         generalTagsContentState = generalTagsContentState.copy(
                             visible = newGeneralTags.isNotEmpty(), tags = newGeneralTags,
+                        )
+                    )
+                }
+            }
+
+            // Remove from artist tags
+            val artistTag = state.artistTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            if (artistTag != null) {
+                val newArtistTags = state.artistTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                return@launch updateState {
+                    copy(
+                        artistTagsContentState = artistTagsContentState.copy(
+                            visible = newArtistTags.isNotEmpty(), tags = newArtistTags,
                         )
                     )
                 }

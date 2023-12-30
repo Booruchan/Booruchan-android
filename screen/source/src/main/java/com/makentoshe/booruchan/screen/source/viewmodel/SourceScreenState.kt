@@ -17,10 +17,13 @@ data class SourceScreenState(
 
     /** State for rating metadata tag */
     val ratingTagContentState: SourceScreenRatingTagContentState,
+
     /** State for all general tags */
     val generalTagsContentState: SourceScreenGeneralTagsContentState,
     /** State for all character tags */
     val characterTagsContentState: SourceScreenCharacterTagsContentState,
+    /** State for all artist tags */
+    val artistTagsContentState: SourceScreenArtistTagsContentState
 ) {
     companion object {
         val InitialState = SourceScreenState(
@@ -46,6 +49,10 @@ data class SourceScreenState(
                 visible = false,
                 tags = emptySet(),
             ),
+            artistTagsContentState = SourceScreenArtistTagsContentState(
+                visible = false,
+                tags = emptySet(),
+            )
         )
     }
 }
@@ -106,6 +113,14 @@ data class SourceScreenCharacterTagsContentState(
     /** Is component should be visible */
     val visible: Boolean,
     /** All character tags that was added to the filter */
+    val tags: Set<TagUiState>,
+)
+
+@Immutable
+data class SourceScreenArtistTagsContentState(
+    /** Is component should be visible */
+    val visible: Boolean,
+    /** All artist tags that was added to the filter */
     val tags: Set<TagUiState>,
 )
 

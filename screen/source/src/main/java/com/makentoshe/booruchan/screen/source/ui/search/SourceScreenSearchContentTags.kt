@@ -1,9 +1,9 @@
 package com.makentoshe.booruchan.screen.source.ui.search
 
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,12 +19,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.library.resources.R
 import com.makentoshe.booruchan.screen.source.ui.components.chip.ChipItem
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenArtistTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenCharacterTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenGeneralTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.ChipGroup
 import com.makentoshe.library.uikit.foundation.SecondaryText
+import com.makentoshe.library.uikit.foundation.SmallText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
@@ -38,6 +40,14 @@ internal fun SourceScreenSearchContentTags(
     if (screenState.ratingTagContentState.visible) {
         SourceScreenSearchContentTagsRating(
             searchState = screenState.ratingTagContentState,
+            screenEvent = screenEvent,
+        )
+    }
+
+    // Show artist tags only if there are any tags to display
+    if (screenState.artistTagsContentState.visible) {
+        SourceScreenSearchContentTagsArtist(
+            artistTagsContentState = screenState.artistTagsContentState,
             screenEvent = screenEvent,
         )
     }
@@ -72,7 +82,7 @@ private fun SourceScreenSearchContentTagsGeneral(
 
     Spacer(modifier = Modifier.size(16.dp))
 
-    SecondaryText(
+    SmallText(
         text = stringResource(id = R.string.source_search_tags_general),
         color = BooruchanTheme.colors.foreground,
     )
@@ -90,25 +100,51 @@ private fun SourceScreenSearchContentTagsGeneral(
 private fun SourceScreenSearchContentTagsCharacter(
     characterTagsContentState: SourceScreenCharacterTagsContentState,
     screenEvent: (SourceScreenEvent) -> Unit,
-) {
-    val characterTags by remember(key1 = characterTagsContentState) {
-        mutableStateOf(characterTagsContentState.tags)
-    }
+) = SourceScreenSearchContentTagsCommon(
+    label = {
+        SmallText(
+            text = stringResource(id = R.string.component_tags_character_title),
+            color = BooruchanTheme.colors.tag.artist,
+        )
+    },
+    content = {
+        characterTagsContentState.tags.forEach { tagUiState ->
+            ChipItem(state = tagUiState, screenEvent = screenEvent)
+        }
+    },
+)
 
+@Composable
+private fun SourceScreenSearchContentTagsArtist(
+    artistTagsContentState: SourceScreenArtistTagsContentState,
+    screenEvent: (SourceScreenEvent) -> Unit,
+) = SourceScreenSearchContentTagsCommon(
+    label = {
+        SmallText(
+            text = stringResource(id = R.string.component_tags_artist_title),
+            color = BooruchanTheme.colors.tag.artist,
+        )
+    },
+    content = {
+        artistTagsContentState.tags.forEach { tagUiState ->
+            ChipItem(state = tagUiState, screenEvent = screenEvent)
+        }
+    },
+)
+
+@Composable
+private fun SourceScreenSearchContentTagsCommon(
+    label: @Composable () -> Unit,
+    content: @Composable RowScope.() -> Unit,
+) {
     Spacer(modifier = Modifier.size(16.dp))
 
-    SecondaryText(
-        text = stringResource(id = R.string.component_tags_character_title),
-        color = BooruchanTheme.colors.tag.character,
-    )
+    label()
 
     Spacer(modifier = Modifier.size(8.dp))
 
     Row(
         modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-    ) {
-        characterTags.forEach { tagUiState ->
-            ChipItem(state = tagUiState, screenEvent = screenEvent)
-        }
-    }
+        content = content,
+    )
 }

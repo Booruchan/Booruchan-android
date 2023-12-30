@@ -18,5 +18,6 @@
     <string name="component_tags_title">Tags</string>
     <string name="component_tags_general_title">General</string>
     <string name="component_tags_character_title">Character</string>
+    <string name="component_tags_artist_title">Artist</string>
 
 </resources>
