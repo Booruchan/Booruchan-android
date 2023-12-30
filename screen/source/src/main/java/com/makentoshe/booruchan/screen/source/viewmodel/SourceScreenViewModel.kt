@@ -326,6 +326,8 @@ class SourceScreenViewModel @Inject constructor(
 
             val generalTags = state.generalTagsContentState.tags
             val characterTags = state.characterTagsContentState.tags
+            val artistTags = state.artistTagsContentState.tags
+            val copyrightTags = state.copyrightTagsContentState.tags
 
             internalLogInfo("invoke apply filters event: ${generalTags + characterTags}")
 
@@ -333,7 +335,7 @@ class SourceScreenViewModel @Inject constructor(
             val fetchPostsFactory = source.fetchPostsFactory
                 ?: return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
-            val tagsQuery = (generalTags + characterTags).joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
+            val tagsQuery = (generalTags + characterTags + artistTags + copyrightTags).joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
 
             val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
                 pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, tagsQuery)
