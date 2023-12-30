@@ -20,5 +20,6 @@
     <string name="component_tags_character_title">Character</string>
     <string name="component_tags_artist_title">Artist</string>
     <string name="component_tags_copyright_title">Copyright</string>
+    <string name="component_tags_metadata_title">Metadata</string>
 
 </resources>

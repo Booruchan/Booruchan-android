@@ -26,6 +26,8 @@ data class SourceScreenState(
     val artistTagsContentState: SourceScreenArtistTagsContentState,
     /** State for all copyright tags */
     val copyrightTagsContentState: SourceScreenCopyrightTagsContentState,
+    /** State for all metadata tags */
+    val metadataTagsContentState: SourceScreenMetadataTagsContentState,
 ) {
     companion object {
         val InitialState = SourceScreenState(
@@ -58,7 +60,11 @@ data class SourceScreenState(
             copyrightTagsContentState = SourceScreenCopyrightTagsContentState(
                 visible = false,
                 tags = emptySet(),
-            )
+            ),
+            metadataTagsContentState = SourceScreenMetadataTagsContentState(
+                visible = false,
+                tags = emptySet(),
+            ),
         )
     }
 }
@@ -135,6 +141,14 @@ data class SourceScreenCopyrightTagsContentState(
     /** Is component should be visible */
     val visible: Boolean,
     /** All copyright tags that was added to the filter */
+    val tags: Set<TagUiState>,
+)
+
+@Immutable
+data class SourceScreenMetadataTagsContentState(
+    /** Is component should be visible */
+    val visible: Boolean,
+    /** All metadata tags that was added to the filter */
     val tags: Set<TagUiState>,
 )
 

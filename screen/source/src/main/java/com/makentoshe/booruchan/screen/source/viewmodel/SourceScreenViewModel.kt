@@ -73,8 +73,8 @@ class SourceScreenViewModel @Inject constructor(
 
         is SourceScreenEvent.SearchValueChange -> searchValueChange(event)
         is SourceScreenEvent.SearchTagAdd -> searchAddTag(event)
-        is SourceScreenEvent.SearchTagChangeRating -> searchChangeTagRating(event)
         is SourceScreenEvent.SearchTagRemove -> searchRemoveTag(event)
+        is SourceScreenEvent.SearchTagChangeRating -> searchChangeTagRating(event)
         is SourceScreenEvent.SearchApplyFilters -> searchApplyFilters()
 
         SourceScreenEvent.ShowSearch -> showSearchViaFullScreen()
@@ -108,15 +108,20 @@ class SourceScreenViewModel @Inject constructor(
         updateState { copy(sourceTitle = source.title) }
 
         onSourceRatingTagContent(source)
+        onSourcePaginationContent(source)
+    }
 
+    private fun onSourcePaginationContent(source: Source) {
         // get fetch posts factory or show failure state
         val fetchPostsFactory = source.fetchPostsFactory
-            ?: return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
+            ?: return updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
+        // create pager with default query
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
             pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, query = "")
         }.flow.cachedIn(viewModelScope)
 
+        // Update state
         updateState {
             copy(contentState = ContentState.Success(pagerFlow = pagerFlow))
         }
@@ -169,17 +174,6 @@ class SourceScreenViewModel @Inject constructor(
                 )
             )
         }
-    }
-
-    private fun navigationBack() {
-        internalLogInfo("invoke navigation back")
-        updateNavigation { SourceScreenDestination.BackDestination }
-    }
-
-    private fun navigationImage(event: SourceScreenEvent.NavigationImage) {
-        val source = pluginInteractor.sourceFlow.value
-        internalLogInfo("invoke navigation image for Source(${source.id}) with Post(${event.id})")
-        updateNavigation { SourceScreenDestination.ImageDestination(postId = event.id, sourceId = source.id) }
     }
 
     private fun searchValueChange(event: SourceScreenEvent.SearchValueChange) {
@@ -280,7 +274,13 @@ class SourceScreenViewModel @Inject constructor(
                     )
                 }
 
-                TagTypeUiState.Metadata -> Unit
+                TagTypeUiState.Metadata -> updateState {
+                    copy(
+                        metadataTagsContentState = metadataTagsContentState.copy(
+                            visible = true, tags = metadataTagsContentState.tags.plus(tagUiState),
+                        ),
+                    )
+                }
             }
         }
     }
@@ -321,21 +321,25 @@ class SourceScreenViewModel @Inject constructor(
                 updateState { copy(contentState = failureContentState(throwable)) }
             },
         ) {
+            internalLogInfo("invoke apply filters event")
+
             val source = pluginInteractor.sourceFlow.value
             if (source is EmptySource) return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
-
-            val generalTags = state.generalTagsContentState.tags
-            val characterTags = state.characterTagsContentState.tags
-            val artistTags = state.artistTagsContentState.tags
-            val copyrightTags = state.copyrightTagsContentState.tags
-
-            internalLogInfo("invoke apply filters event: ${generalTags + characterTags}")
 
             // get fetch posts factory or show failure state
             val fetchPostsFactory = source.fetchPostsFactory
                 ?: return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
-            val tagsQuery = (generalTags + characterTags + artistTags + copyrightTags).joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
+            // Collect tags from groups
+            val generalTags = state.generalTagsContentState.tags
+            val characterTags = state.characterTagsContentState.tags
+            val artistTags = state.artistTagsContentState.tags
+            val copyrightTags = state.copyrightTagsContentState.tags
+            val metadataTags = state.metadataTagsContentState.tags
+
+            // Join all tags together
+            val tagsQuery =
+                (generalTags + characterTags + artistTags + copyrightTags + metadataTags).joinToString(fetchPostsFactory.searchTagSeparator) { it.tag }
 
             val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
                 pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, tagsQuery)
@@ -403,8 +407,31 @@ class SourceScreenViewModel @Inject constructor(
                 }
             }
 
+            val metadataTag = state.metadataTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            if (metadataTag != null) {
+                val newMetadataTag = state.metadataTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                return@launch updateState {
+                    copy(
+                        metadataTagsContentState = metadataTagsContentState.copy(
+                            visible = newMetadataTag.isNotEmpty(), tags = newMetadataTag,
+                        ),
+                    )
+                }
+            }
+
             return@launch internalLogWarn("could not find tag: ${event.tag}")
         }
+    }
+
+    private fun navigationBack() {
+        internalLogInfo("invoke navigation back")
+        updateNavigation { SourceScreenDestination.BackDestination }
+    }
+
+    private fun navigationImage(event: SourceScreenEvent.NavigationImage) {
+        val source = pluginInteractor.sourceFlow.value
+        internalLogInfo("invoke navigation image for Source(${source.id}) with Post(${event.id})")
+        updateNavigation { SourceScreenDestination.ImageDestination(postId = event.id, sourceId = source.id) }
     }
 
     private fun showErrorViaSnackbar(event: SourceScreenEvent.ShowSnackbar) {

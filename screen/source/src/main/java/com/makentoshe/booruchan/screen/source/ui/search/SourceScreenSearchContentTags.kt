@@ -24,6 +24,7 @@ import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenCharacterTag
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenCopyrightTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenGeneralTagsContentState
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenMetadataTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.ChipGroup
 import com.makentoshe.library.uikit.foundation.SmallText
@@ -68,6 +69,14 @@ internal fun SourceScreenSearchContentTags(
         )
     }
 
+    // Show metadata tags only if there are any tags to display
+    if (screenState.metadataTagsContentState.visible) {
+        SourceScreenSearchContentTagsMetadata(
+            metadataTagsContentState = screenState.metadataTagsContentState,
+            screenEvent = screenEvent,
+        )
+    }
+
     // Show general tags only if there are any tags to display
     if (screenState.generalTagsContentState.visible) {
         SourceScreenSearchContentTagsGeneral(
@@ -75,7 +84,6 @@ internal fun SourceScreenSearchContentTags(
             screenEvent = screenEvent,
         )
     }
-
 }
 
 
@@ -153,6 +161,24 @@ private fun SourceScreenSearchContentTagsCopyright(
     },
     content = {
         copyrightTagsContentState.tags.forEach { tagUiState ->
+            ChipItem(state = tagUiState, screenEvent = screenEvent)
+        }
+    },
+)
+
+@Composable
+private fun SourceScreenSearchContentTagsMetadata(
+    metadataTagsContentState: SourceScreenMetadataTagsContentState,
+    screenEvent: (SourceScreenEvent) -> Unit,
+) = SourceScreenSearchContentTagsCommon(
+    label = {
+        SmallText(
+            text = stringResource(id = R.string.component_tags_metadata_title),
+            color = BooruchanTheme.colors.tag.metadata,
+        )
+    },
+    content = {
+        metadataTagsContentState.tags.forEach { tagUiState ->
             ChipItem(state = tagUiState, screenEvent = screenEvent)
         }
     },
