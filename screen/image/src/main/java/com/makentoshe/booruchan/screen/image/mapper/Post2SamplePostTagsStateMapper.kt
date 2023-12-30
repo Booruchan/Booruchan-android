@@ -1,8 +1,8 @@
 package com.makentoshe.booruchan.screen.image.mapper
 
 import com.makentoshe.booruchan.feature.entity.Post
-import com.makentoshe.booruchan.screen.entity.TagTypeUiState
-import com.makentoshe.booruchan.screen.entity.TagUiState
+import com.makentoshe.library.uikit.entity.TagTypeUiState
+import com.makentoshe.library.uikit.entity.TagUiState
 import com.makentoshe.booruchan.screen.image.entity.SamplePostTagsState
 import javax.inject.Inject
 

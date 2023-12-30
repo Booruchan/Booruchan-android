@@ -1,8 +1,7 @@
 package com.makentoshe.booruchan.screen.image.ui.components.chip
 
 import androidx.compose.runtime.Composable
-import com.makentoshe.booruchan.screen.entity.TagUiState
-import com.makentoshe.booruchan.screen.image.viewmodel.ImageScreenEvent
+import com.makentoshe.library.uikit.entity.TagUiState
 import com.makentoshe.library.uikit.foundation.ChipItem
 import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.theme.BooruchanTheme

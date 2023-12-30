@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.screen.source.entity
 
-import com.makentoshe.booruchan.screen.entity.TagTypeUiState
+import com.makentoshe.library.uikit.entity.TagTypeUiState
 
 data class AutocompleteUiState(
     val value: String,

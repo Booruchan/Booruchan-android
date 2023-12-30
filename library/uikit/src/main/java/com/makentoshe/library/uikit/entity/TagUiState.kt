@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.screen.entity
+package com.makentoshe.library.uikit.entity
 
 data class TagUiState(val tag: String, val type: TagTypeUiState) {
 

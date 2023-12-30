@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="source_search_tag_rating">Rating</string>
+    <string name="source_search_tags_general">General</string>
+
+
+    <string name="component_tags_title">Tags</string>
+    <string name="component_tags_general_title">General</string>
+    <string name="component_tags_character_title">Character</string>
+    <string name="component_tags_artist_title">Artist</string>
+    <string name="component_tags_copyright_title">Copyright</string>
+    <string name="component_tags_metadata_title">Metadata</string>
 </resources>

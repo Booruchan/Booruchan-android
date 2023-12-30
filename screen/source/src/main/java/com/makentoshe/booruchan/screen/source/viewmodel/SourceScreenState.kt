@@ -1,10 +1,12 @@
 package com.makentoshe.booruchan.screen.source.viewmodel
 
 import androidx.paging.PagingData
-import com.makentoshe.booruchan.screen.entity.TagUiState
+import com.makentoshe.library.uikit.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.entity.AutocompleteUiState
 import com.makentoshe.booruchan.screen.source.entity.PreviewPostUiState
-import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
+import com.makentoshe.library.uikit.component.rating.RatingSegmentedButtonState
+import com.makentoshe.library.uikit.component.tags.TagsComponentState
+import com.makentoshe.library.uikit.component.tags.TagsContentState
 import kotlinx.coroutines.flow.Flow
 import javax.annotation.concurrent.Immutable
 
@@ -18,16 +20,7 @@ data class SourceScreenState(
     /** State for rating metadata tag */
     val ratingTagContentState: SourceScreenRatingTagContentState,
 
-    /** State for all general tags */
-    val generalTagsContentState: SourceScreenGeneralTagsContentState,
-    /** State for all character tags */
-    val characterTagsContentState: SourceScreenCharacterTagsContentState,
-    /** State for all artist tags */
-    val artistTagsContentState: SourceScreenArtistTagsContentState,
-    /** State for all copyright tags */
-    val copyrightTagsContentState: SourceScreenCopyrightTagsContentState,
-    /** State for all metadata tags */
-    val metadataTagsContentState: SourceScreenMetadataTagsContentState,
+    val tagsComponentState: TagsComponentState,
 ) {
     companion object {
         val InitialState = SourceScreenState(
@@ -43,28 +36,30 @@ data class SourceScreenState(
             ),
             ratingTagContentState = SourceScreenRatingTagContentState(
                 visible = false,
-                ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(values = emptyList())
+                ratingTagSegmentedButtonState = RatingSegmentedButtonState(values = emptyList())
             ),
-            generalTagsContentState = SourceScreenGeneralTagsContentState(
-                visible = false,
-                tags = emptySet(),
-            ),
-            characterTagsContentState = SourceScreenCharacterTagsContentState(
-                visible = false,
-                tags = emptySet(),
-            ),
-            artistTagsContentState = SourceScreenArtistTagsContentState(
-                visible = false,
-                tags = emptySet(),
-            ),
-            copyrightTagsContentState = SourceScreenCopyrightTagsContentState(
-                visible = false,
-                tags = emptySet(),
-            ),
-            metadataTagsContentState = SourceScreenMetadataTagsContentState(
-                visible = false,
-                tags = emptySet(),
-            ),
+            tagsComponentState = TagsComponentState(
+                generalTagsContentState = TagsContentState(
+                    visible = false,
+                    tags = emptySet(),
+                ),
+                characterTagsContentState = TagsContentState(
+                    visible = false,
+                    tags = emptySet(),
+                ),
+                artistTagsContentState = TagsContentState(
+                    visible = false,
+                    tags = emptySet(),
+                ),
+                copyrightTagsContentState = TagsContentState(
+                    visible = false,
+                    tags = emptySet(),
+                ),
+                metadataTagsContentState = TagsContentState(
+                    visible = false,
+                    tags = emptySet(),
+                ),
+            )
         )
     }
 }
@@ -109,47 +104,7 @@ data class SourceScreenRatingTagContentState(
     /** Is component should be visible */
     val visible: Boolean,
     /** All values for "rating" metadata tag */
-    val ratingTagSegmentedButtonState: TagsRatingSegmentedButtonState,
-)
-
-@Immutable
-data class SourceScreenGeneralTagsContentState(
-    /** Is component should be visible */
-    val visible: Boolean,
-    /** All general tags that was added to the filter */
-    val tags: Set<TagUiState>,
-)
-
-@Immutable
-data class SourceScreenCharacterTagsContentState(
-    /** Is component should be visible */
-    val visible: Boolean,
-    /** All character tags that was added to the filter */
-    val tags: Set<TagUiState>,
-)
-
-@Immutable
-data class SourceScreenArtistTagsContentState(
-    /** Is component should be visible */
-    val visible: Boolean,
-    /** All artist tags that was added to the filter */
-    val tags: Set<TagUiState>,
-)
-
-@Immutable
-data class SourceScreenCopyrightTagsContentState(
-    /** Is component should be visible */
-    val visible: Boolean,
-    /** All copyright tags that was added to the filter */
-    val tags: Set<TagUiState>,
-)
-
-@Immutable
-data class SourceScreenMetadataTagsContentState(
-    /** Is component should be visible */
-    val visible: Boolean,
-    /** All metadata tags that was added to the filter */
-    val tags: Set<TagUiState>,
+    val ratingTagSegmentedButtonState: RatingSegmentedButtonState,
 )
 
 @Immutable

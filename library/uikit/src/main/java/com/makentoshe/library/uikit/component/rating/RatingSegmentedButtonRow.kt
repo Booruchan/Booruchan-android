@@ -1,4 +1,4 @@
-package com.makentoshe.library.uikit.component.tags
+package com.makentoshe.library.uikit.component.rating
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +18,8 @@ import com.makentoshe.library.uikit.foundation.SmallText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
 @Composable
-fun TagsRatingSegmentedButtonRow(
-    state: TagsRatingSegmentedButtonState,
+fun RatingSegmentedButtonRow(
+    state: RatingSegmentedButtonState,
     enabled: Boolean = true,
     onClick: (Int, Boolean) -> Unit,
 ) = Column {
@@ -43,7 +43,7 @@ fun TagsRatingSegmentedButtonRow(
                 shape = shape.copy(topEnd = CornerSize(8.dp), bottomEnd = CornerSize(8.dp))
             }
 
-            TagsRatingSegmentedButton(
+            RatingSegmentedButton(
                 value = value,
                 onClick = { onClick(index, it) },
                 shape = shape,
@@ -55,7 +55,7 @@ fun TagsRatingSegmentedButtonRow(
 }
 
 @Composable
-fun MultiChoiceSegmentedButtonRowScope.TagsRatingSegmentedButton(
+fun MultiChoiceSegmentedButtonRowScope.RatingSegmentedButton(
     value: String,
     onClick: (Boolean) -> Unit,
     checked: Boolean = false,

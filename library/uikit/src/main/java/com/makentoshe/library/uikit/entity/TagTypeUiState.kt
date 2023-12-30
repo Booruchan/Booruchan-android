@@ -1,4 +1,4 @@
-package com.makentoshe.booruchan.screen.entity
+package com.makentoshe.library.uikit.entity
 
 enum class TagTypeUiState {
     General, Artist, Character, Copyright, Metadata, Other

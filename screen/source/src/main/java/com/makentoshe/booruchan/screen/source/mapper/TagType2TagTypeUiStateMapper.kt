@@ -1,7 +1,7 @@
 package com.makentoshe.booruchan.screen.source.mapper
 
 import com.makentoshe.booruchan.feature.entity.TagType
-import com.makentoshe.booruchan.screen.entity.TagTypeUiState
+import com.makentoshe.library.uikit.entity.TagTypeUiState
 import javax.inject.Inject
 
 class TagType2TagTypeUiStateMapper @Inject constructor() {

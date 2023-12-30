@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.makentoshe.booruchan.screen.image.entity.SamplePostImageState
 import com.makentoshe.booruchan.screen.image.entity.SamplePostScoreState
 import com.makentoshe.booruchan.screen.image.entity.SamplePostTagsState
-import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
+import com.makentoshe.library.uikit.component.rating.RatingSegmentedButtonState
 
 @Immutable
 data class ImageScreenState(
@@ -40,6 +40,6 @@ sealed interface ContentState {
         val samplePostImageState: SamplePostImageState,
         val samplePostTagsState: SamplePostTagsState,
         val samplePostScoreState: SamplePostScoreState,
-        val samplePostRatingState: TagsRatingSegmentedButtonState,
+        val samplePostRatingState: RatingSegmentedButtonState,
     ): ContentState
 }

@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenRatingTagContentState
-import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonRow
+import com.makentoshe.library.uikit.component.rating.RatingSegmentedButtonRow
 
 @Composable
 internal fun SourceScreenSearchContentTagsRating(
@@ -16,7 +16,7 @@ internal fun SourceScreenSearchContentTagsRating(
 ) {
     Spacer(modifier = Modifier.size(16.dp))
 
-    TagsRatingSegmentedButtonRow(
+    RatingSegmentedButtonRow(
         state = searchState.ratingTagSegmentedButtonState,
         enabled = true,
         onClick = { it, _ -> screenEvent(SourceScreenEvent.SearchTagChangeRating(it)) },

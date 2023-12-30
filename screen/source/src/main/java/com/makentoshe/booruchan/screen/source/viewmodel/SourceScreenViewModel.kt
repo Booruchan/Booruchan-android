@@ -25,12 +25,12 @@ import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEnt
 import com.makentoshe.booruchan.library.logging.internalLogError
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
-import com.makentoshe.booruchan.screen.entity.TagTypeUiState
-import com.makentoshe.booruchan.screen.entity.TagUiState
+import com.makentoshe.library.uikit.entity.TagTypeUiState
+import com.makentoshe.library.uikit.entity.TagUiState
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
 import com.makentoshe.booruchan.screen.source.mapper.Tag2TagUiStateMapper
 import com.makentoshe.booruchan.screen.source.paging.PagingSourceFactory
-import com.makentoshe.library.uikit.component.tags.TagsRatingSegmentedButtonState
+import com.makentoshe.library.uikit.component.rating.RatingSegmentedButtonState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -135,7 +135,7 @@ class SourceScreenViewModel @Inject constructor(
         updateState {
             copy(
                 ratingTagContentState = SourceScreenRatingTagContentState(
-                    visible = false, ratingTagSegmentedButtonState = TagsRatingSegmentedButtonState(
+                    visible = false, ratingTagSegmentedButtonState = RatingSegmentedButtonState(
                         values = ratingTagValues,
                     )
                 )
@@ -244,41 +244,54 @@ class SourceScreenViewModel @Inject constructor(
             when (tagUiState.type) {
                 TagTypeUiState.General, TagTypeUiState.Other -> updateState {
                     copy(
-                        generalTagsContentState = generalTagsContentState.copy(
-                            visible = true, tags = generalTagsContentState.tags.plus(tagUiState),
-                        ),
+                        tagsComponentState = tagsComponentState.copy(
+                            generalTagsContentState = tagsComponentState.generalTagsContentState.copy(
+                                visible = true, tags = tagsComponentState.generalTagsContentState.tags.plus(tagUiState),
+                            )
+                        )
                     )
                 }
 
                 TagTypeUiState.Artist -> updateState {
                     copy(
-                        artistTagsContentState = artistTagsContentState.copy(
-                            visible = true, tags = artistTagsContentState.tags.plus(tagUiState),
-                        ),
+                        tagsComponentState = tagsComponentState.copy(
+                            artistTagsContentState = tagsComponentState.artistTagsContentState.copy(
+                                visible = true, tags = tagsComponentState.artistTagsContentState.tags.plus(tagUiState),
+                            )
+                        )
                     )
                 }
 
                 TagTypeUiState.Character -> updateState {
                     copy(
-                        characterTagsContentState = characterTagsContentState.copy(
-                            visible = true, tags = characterTagsContentState.tags.plus(tagUiState),
-                        ),
+                        tagsComponentState = tagsComponentState.copy(
+                            characterTagsContentState = tagsComponentState.characterTagsContentState.copy(
+                                visible = true,
+                                tags = tagsComponentState.characterTagsContentState.tags.plus(tagUiState),
+                            ),
+                        )
                     )
                 }
 
                 TagTypeUiState.Copyright -> updateState {
                     copy(
-                        copyrightTagsContentState = copyrightTagsContentState.copy(
-                            visible = true, tags = copyrightTagsContentState.tags.plus(tagUiState),
-                        ),
+                        tagsComponentState = tagsComponentState.copy(
+                            copyrightTagsContentState = tagsComponentState.copyrightTagsContentState.copy(
+                                visible = true,
+                                tags = tagsComponentState.copyrightTagsContentState.tags.plus(tagUiState),
+                            ),
+                        )
                     )
                 }
 
                 TagTypeUiState.Metadata -> updateState {
                     copy(
-                        metadataTagsContentState = metadataTagsContentState.copy(
-                            visible = true, tags = metadataTagsContentState.tags.plus(tagUiState),
-                        ),
+                        tagsComponentState = tagsComponentState.copy(
+                            metadataTagsContentState = tagsComponentState.metadataTagsContentState.copy(
+                                visible = true,
+                                tags = tagsComponentState.metadataTagsContentState.tags.plus(tagUiState),
+                            ),
+                        )
                     )
                 }
             }
@@ -331,11 +344,11 @@ class SourceScreenViewModel @Inject constructor(
                 ?: return@launch updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
 
             // Collect tags from groups
-            val generalTags = state.generalTagsContentState.tags
-            val characterTags = state.characterTagsContentState.tags
-            val artistTags = state.artistTagsContentState.tags
-            val copyrightTags = state.copyrightTagsContentState.tags
-            val metadataTags = state.metadataTagsContentState.tags
+            val generalTags = state.tagsComponentState.generalTagsContentState.tags
+            val characterTags = state.tagsComponentState.characterTagsContentState.tags
+            val artistTags = state.tagsComponentState.artistTagsContentState.tags
+            val copyrightTags = state.tagsComponentState.copyrightTagsContentState.tags
+            val metadataTags = state.tagsComponentState.metadataTagsContentState.tags
 
             // Join all tags together
             val tagsQuery =
@@ -356,65 +369,82 @@ class SourceScreenViewModel @Inject constructor(
             internalLogInfo("invoke remove tag: ${event.tag}")
 
             // Remove from general tags
-            val generalTag = state.generalTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            val generalTag = state.tagsComponentState.generalTagsContentState.tags.firstOrNull { it.tag == event.tag }
             if (generalTag != null) {
-                val newGeneralTags = state.generalTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                val newGeneralTags =
+                    state.tagsComponentState.generalTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
                 return@launch updateState {
                     copy(
-                        generalTagsContentState = generalTagsContentState.copy(
-                            visible = newGeneralTags.isNotEmpty(), tags = newGeneralTags,
+                        tagsComponentState = tagsComponentState.copy(
+                            generalTagsContentState = tagsComponentState.generalTagsContentState.copy(
+                                visible = newGeneralTags.isNotEmpty(), tags = newGeneralTags,
+                            )
                         )
                     )
                 }
             }
 
             // Remove from artist tags
-            val artistTag = state.artistTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            val artistTag = state.tagsComponentState.artistTagsContentState.tags.firstOrNull { it.tag == event.tag }
             if (artistTag != null) {
-                val newArtistTags = state.artistTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                val newArtistTags =
+                    state.tagsComponentState.artistTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
                 return@launch updateState {
                     copy(
-                        artistTagsContentState = artistTagsContentState.copy(
-                            visible = newArtistTags.isNotEmpty(), tags = newArtistTags,
+                        tagsComponentState = tagsComponentState.copy(
+                            artistTagsContentState = tagsComponentState.artistTagsContentState.copy(
+                                visible = newArtistTags.isNotEmpty(), tags = newArtistTags,
+                            )
                         )
                     )
                 }
             }
 
             // Remove from character tags
-            val characterTag = state.characterTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            val characterTag =
+                state.tagsComponentState.characterTagsContentState.tags.firstOrNull { it.tag == event.tag }
             if (characterTag != null) {
-                val newCharacterTags = state.characterTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                val newCharacterTags =
+                    state.tagsComponentState.characterTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
                 return@launch updateState {
                     copy(
-                        characterTagsContentState = characterTagsContentState.copy(
-                            visible = newCharacterTags.isNotEmpty(), tags = newCharacterTags,
+                        tagsComponentState = tagsComponentState.copy(
+                            characterTagsContentState = tagsComponentState.characterTagsContentState.copy(
+                                visible = newCharacterTags.isNotEmpty(), tags = newCharacterTags,
+                            )
                         )
                     )
                 }
             }
 
             // Remove from copyright tags
-            val copyrightTag = state.copyrightTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            val copyrightTag =
+                state.tagsComponentState.copyrightTagsContentState.tags.firstOrNull { it.tag == event.tag }
             if (copyrightTag != null) {
-                val newCopyrightTag = state.copyrightTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                val newCopyrightTag =
+                    state.tagsComponentState.copyrightTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
                 return@launch updateState {
                     copy(
-                        copyrightTagsContentState = copyrightTagsContentState.copy(
-                            visible = newCopyrightTag.isNotEmpty(), tags = newCopyrightTag,
+                        tagsComponentState = tagsComponentState.copy(
+                            copyrightTagsContentState = tagsComponentState.copyrightTagsContentState.copy(
+                                visible = newCopyrightTag.isNotEmpty(), tags = newCopyrightTag,
+                            )
                         )
                     )
                 }
             }
 
-            val metadataTag = state.metadataTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            val metadataTag = state.tagsComponentState.metadataTagsContentState.tags.firstOrNull { it.tag == event.tag }
             if (metadataTag != null) {
-                val newMetadataTag = state.metadataTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                val newMetadataTag =
+                    state.tagsComponentState.metadataTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
                 return@launch updateState {
                     copy(
-                        metadataTagsContentState = metadataTagsContentState.copy(
-                            visible = newMetadataTag.isNotEmpty(), tags = newMetadataTag,
-                        ),
+                        tagsComponentState = tagsComponentState.copy(
+                            metadataTagsContentState = tagsComponentState.metadataTagsContentState.copy(
+                                visible = newMetadataTag.isNotEmpty(), tags = newMetadataTag,
+                            ),
+                        )
                     )
                 }
             }
