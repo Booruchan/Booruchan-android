@@ -272,7 +272,14 @@ class SourceScreenViewModel @Inject constructor(
                     )
                 }
 
-                TagTypeUiState.Copyright -> Unit
+                TagTypeUiState.Copyright -> updateState {
+                    copy(
+                        copyrightTagsContentState = copyrightTagsContentState.copy(
+                            visible = true, tags = copyrightTagsContentState.tags.plus(tagUiState),
+                        ),
+                    )
+                }
+
                 TagTypeUiState.Metadata -> Unit
             }
         }
@@ -376,6 +383,19 @@ class SourceScreenViewModel @Inject constructor(
                     copy(
                         characterTagsContentState = characterTagsContentState.copy(
                             visible = newCharacterTags.isNotEmpty(), tags = newCharacterTags,
+                        )
+                    )
+                }
+            }
+
+            // Remove from copyright tags
+            val copyrightTag = state.copyrightTagsContentState.tags.firstOrNull { it.tag == event.tag }
+            if (copyrightTag != null) {
+                val newCopyrightTag = state.copyrightTagsContentState.tags.filterNot { it.tag == event.tag }.toSet()
+                return@launch updateState {
+                    copy(
+                        copyrightTagsContentState = copyrightTagsContentState.copy(
+                            visible = newCopyrightTag.isNotEmpty(), tags = newCopyrightTag,
                         )
                     )
                 }

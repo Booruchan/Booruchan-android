@@ -21,11 +21,11 @@ import com.makentoshe.booruchan.library.resources.R
 import com.makentoshe.booruchan.screen.source.ui.components.chip.ChipItem
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenArtistTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenCharacterTagsContentState
+import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenCopyrightTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenEvent
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenGeneralTagsContentState
 import com.makentoshe.booruchan.screen.source.viewmodel.SourceScreenState
 import com.makentoshe.library.uikit.foundation.ChipGroup
-import com.makentoshe.library.uikit.foundation.SecondaryText
 import com.makentoshe.library.uikit.foundation.SmallText
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 
@@ -44,10 +44,10 @@ internal fun SourceScreenSearchContentTags(
         )
     }
 
-    // Show artist tags only if there are any tags to display
-    if (screenState.artistTagsContentState.visible) {
-        SourceScreenSearchContentTagsArtist(
-            artistTagsContentState = screenState.artistTagsContentState,
+    // Show copyright tags only if there are any tags to display
+    if (screenState.copyrightTagsContentState.visible) {
+        SourceScreenSearchContentTagsCopyright(
+            copyrightTagsContentState = screenState.copyrightTagsContentState,
             screenEvent = screenEvent,
         )
     }
@@ -56,6 +56,14 @@ internal fun SourceScreenSearchContentTags(
     if (screenState.characterTagsContentState.visible) {
         SourceScreenSearchContentTagsCharacter(
             characterTagsContentState = screenState.characterTagsContentState,
+            screenEvent = screenEvent,
+        )
+    }
+
+    // Show artist tags only if there are any tags to display
+    if (screenState.artistTagsContentState.visible) {
+        SourceScreenSearchContentTagsArtist(
+            artistTagsContentState = screenState.artistTagsContentState,
             screenEvent = screenEvent,
         )
     }
@@ -127,6 +135,24 @@ private fun SourceScreenSearchContentTagsArtist(
     },
     content = {
         artistTagsContentState.tags.forEach { tagUiState ->
+            ChipItem(state = tagUiState, screenEvent = screenEvent)
+        }
+    },
+)
+
+@Composable
+private fun SourceScreenSearchContentTagsCopyright(
+    copyrightTagsContentState: SourceScreenCopyrightTagsContentState,
+    screenEvent: (SourceScreenEvent) -> Unit,
+) = SourceScreenSearchContentTagsCommon(
+    label = {
+        SmallText(
+            text = stringResource(id = R.string.component_tags_copyright_title),
+            color = BooruchanTheme.colors.tag.copyright,
+        )
+    },
+    content = {
+        copyrightTagsContentState.tags.forEach { tagUiState ->
             ChipItem(state = tagUiState, screenEvent = screenEvent)
         }
     },
