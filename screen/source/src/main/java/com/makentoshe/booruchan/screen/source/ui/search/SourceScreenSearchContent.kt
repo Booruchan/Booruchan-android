@@ -1,6 +1,7 @@
 package com.makentoshe.booruchan.screen.source.ui.search
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +18,7 @@ internal fun SourceScreenSearchContent(
     screenState: SourceScreenState,
     screenEvent: (SourceScreenEvent) -> Unit,
 ) = Column(
-    modifier = Modifier.fillMaxSize().background(BooruchanTheme.colors.dashboard),
+    modifier = Modifier.fillMaxSize().background(BooruchanTheme.colors.dashboard).clickable(enabled = false) {},
 ) {
     SourceScreenSearchTopAppBar(screenState = screenState, screenEvent = screenEvent)
 
