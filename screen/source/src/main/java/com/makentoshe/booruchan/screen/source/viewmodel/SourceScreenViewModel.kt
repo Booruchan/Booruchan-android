@@ -22,6 +22,7 @@ import com.makentoshe.booruchan.library.feature.EventDelegate
 import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEntityMapper
+import com.makentoshe.booruchan.library.logging.internalLogError
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
@@ -121,7 +122,12 @@ class SourceScreenViewModel @Inject constructor(
     private fun onSourcePaginationContent(source: Source) {
         // get fetch posts factory or show failure state
         val fetchPostsFactory = source.fetchPostsFactory
-            ?: return updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
+        if (fetchPostsFactory == null) {
+            internalLogWarn("OnSource: fetch posts factory is null")
+            return updateState { copy(contentState = pluginFetchPostFactoryNullContentState()) }
+        }
+
+        internalLogInfo("OnSource: pagination content with query: \"\"")
 
         // create pager with default query
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
@@ -424,7 +430,7 @@ class SourceScreenViewModel @Inject constructor(
 
         // Join all tags together
         val tagsQuery = joinedTags.joinToString(source.settings.searchSettings.searchTagAnd) { it.tag }
-        internalLogWarn("continue event: tags query: $tagsQuery")
+        internalLogWarn("continue event: pagination content query: \"$tagsQuery\"")
 
         val pagerFlow = Pager(PagingConfig(pageSize = fetchPostsFactory.requestedPostsPerPageCount)) {
             pagingSourceFactory.buildPostPagingSource(source = source, fetchPostsFactory, tagsQuery)
