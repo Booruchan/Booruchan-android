@@ -1,4 +1,4 @@
-package com.makentoshe.screen.boorulist.ui
+package com.makentoshe.screen.boorulist.ui.scaffold.horizontalpager
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +9,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,17 +20,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.makentoshe.library.uikit.theme.BooruchanTheme
 import com.makentoshe.screen.boorulist.viewmodel.HomeScreenEvent
-import com.makentoshe.screen.boorulist.viewmodel.HomeScreenPluginContent
+import com.makentoshe.screen.boorulist.viewmodel.HomeScreenSourcePageContent
 import com.makentoshe.screen.boorulist.viewmodel.HomeScreenState
 
-@Composable
 @OptIn(ExperimentalMaterialApi::class)
-internal fun HomeScreenUiContent(
+@Composable
+internal fun HomeScreenContentHorizontalPagerSourcePageContent(
     screenState: HomeScreenState,
     screenEvent: (HomeScreenEvent) -> Unit,
-    pluginContent: HomeScreenPluginContent.Content,
+    pageContentState: HomeScreenSourcePageContent.Content,
 ) {
-    var refreshing by remember(key1 = pluginContent) { mutableStateOf(pluginContent.refreshing) }
+    var refreshing by remember(key1 = pageContentState) { mutableStateOf(pageContentState.refreshing) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = {
@@ -44,13 +44,13 @@ internal fun HomeScreenUiContent(
         contentAlignment = Alignment.TopCenter,
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(pluginContent.sources) { source ->
-                SourceItem(
+            items(pageContentState.sources) { source ->
+                HomeScreenContentHorizontalPagerSourcePageContentItem(
                     sourceUiState = source,
                     onClick = { screenEvent(HomeScreenEvent.NavigationSource(sourceId = source.id)) },
                 )
 
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
                     color = BooruchanTheme.colors.separator,
                     thickness = 1.dp,

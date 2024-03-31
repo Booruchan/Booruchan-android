@@ -1,22 +1,41 @@
 package com.makentoshe.screen.boorulist.viewmodel
 
+import androidx.compose.runtime.Immutable
 import com.makentoshe.screen.boorulist.entity.SourceUiState
 
+@Immutable
 data class HomeScreenState(
-    val pluginContent: HomeScreenPluginContent,
+    val floatingButtonText: String,
+    val sourcePageState: HomeScreenSourcePageState,
 ) {
     companion object {
         val InitialState = HomeScreenState(
-            pluginContent = HomeScreenPluginContent.Loading,
+            floatingButtonText = "Add Plugins",
+            sourcePageState = HomeScreenSourcePageState(
+                title = "",
+                content = HomeScreenSourcePageContent.None,
+            ),
         )
     }
 }
 
-sealed interface HomeScreenPluginContent {
-    object Loading : HomeScreenPluginContent
+@Immutable
+data class HomeScreenSourcePageState(
+    val title: String,
+    val content: HomeScreenSourcePageContent,
+)
+
+sealed interface HomeScreenSourcePageContent {
+
+    object None: HomeScreenSourcePageContent
+
+    object Loading : HomeScreenSourcePageContent
 
     data class Content(
-        val refreshing: Boolean,
         val sources: List<SourceUiState>,
-    ) : HomeScreenPluginContent
+        val refreshing: Boolean,
+    ) : HomeScreenSourcePageContent
 }
+
+val HomeScreenState.tabs: List<String>
+    get() = listOf(sourcePageState.title)

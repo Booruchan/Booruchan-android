@@ -7,9 +7,9 @@ data class SourceUiState(
     val id: String,
     val title: String,
     val host: String,
-    val health: SourceHealthUi,
+    val healthState: SourceHealthUiState,
 )
 
-enum class SourceHealthUi {
+enum class SourceHealthUiState {
     Loading, Available, Unavailable,
 }

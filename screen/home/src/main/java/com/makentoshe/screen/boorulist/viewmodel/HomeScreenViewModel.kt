@@ -16,11 +16,14 @@ import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.feature.usecase.GetAllPluginsUseCase
-import com.makentoshe.screen.boorulist.entity.SourceHealthUi
+import com.makentoshe.screen.boorulist.entity.SourceHealthUiState
 import com.makentoshe.screen.boorulist.mapper.Source2SourceUiStateMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,10 +39,78 @@ class HomeScreenViewModel @Inject constructor(
     EventDelegate<HomeScreenEvent> by DefaultEventDelegate(),
     NavigationDelegate<HomeScreenDestination> by DefaultNavigationDelegate() {
 
-    init {
-        internalLogInfo("OnViewModelConstruct")
+    private val _sourcesSharedFlow: MutableSharedFlow<List<Source>> = MutableSharedFlow()
+    private val sourcesSharedFlow: SharedFlow<List<Source>> get() = _sourcesSharedFlow
 
-        refreshPlugins()
+    init {
+        viewModelScope.iolaunch {
+            sourcesSharedFlow.collectLatest(::onSourcesCollect)
+        }
+    }
+
+    override fun handleEvent(event: HomeScreenEvent) = when (event) {
+        is HomeScreenEvent.Initialize -> initialize(event)
+        is HomeScreenEvent.NavigationSource -> navigateSource(event)
+        HomeScreenEvent.RefreshPlugins -> refreshPlugins()
+    }
+
+    private fun initialize(event: HomeScreenEvent.Initialize) {
+        internalLogInfo("invoke event: $event")
+
+        if (state.sourcePageState.content !is HomeScreenSourcePageContent.None) {
+            return internalLogInfo("$event event: abandon")
+        }
+
+        updateState {
+            copy(sourcePageState = sourcePageState.copy(title = "Sources"))
+        }
+
+        initializeSource(event)
+
+//        viewModelScope.iolaunch(Dispatchers.IO) {
+//            val plugins = findAllPlugins()
+//            internalLogInfo("continue event: found ${plugins.count()} plugins")
+//
+//            val sources = plugins.mapNotNull(pluginFactory::buildSource).onEach(::onHealthCheckSource)
+//            val sourceUiList = sources.map(source2SourceUiStateMapper::map)
+//            updateState {
+//                copy(pluginContent = HomeScreenSourcePage2.Content(sources = sourceUiList, refreshing = false))
+//            }
+//        }
+    }
+
+    private fun initializeSource(event: HomeScreenEvent.Initialize) {
+        updateState {
+            copy(
+                sourcePageState = sourcePageState.copy(
+                    content = HomeScreenSourcePageContent.Loading,
+                )
+            )
+        }
+
+        viewModelScope.iolaunch(Dispatchers.IO) {
+            val plugins = findAllPlugins()
+            internalLogInfo("$event event: found ${plugins.count()} plugins")
+
+            _sourcesSharedFlow.emit(plugins.mapNotNull(pluginFactory::buildSource))
+        }
+    }
+
+    private fun onSourcesCollect(sources: List<Source>) {
+        internalLogInfo("Collect Sources: $sources")
+        sources.onEach(::onHealthCheckSource)
+
+        val sourceUiList = sources.map(source2SourceUiStateMapper::map)
+        updateState {
+            copy(
+                sourcePageState = sourcePageState.copy(
+                    content = HomeScreenSourcePageContent.Content(
+                        refreshing = false,
+                        sources = sourceUiList,
+                    )
+                )
+            )
+        }
     }
 
     private fun onHealthCheckSource(source: Source) {
@@ -55,38 +126,39 @@ class HomeScreenViewModel @Inject constructor(
 
     private fun onHealthCheckFailure(source: Source, throwable: Throwable) {
         internalLogWarn("Healthcheck(${source.id}): $throwable")
-        updateSourceUiStateHealthCheck(source, SourceHealthUi.Unavailable)
+        updateSourceUiStateHealthCheck(source, SourceHealthUiState.Unavailable)
     }
 
     private fun onHealthCheckSuccess(source: Source, isAvailabile: Boolean) {
         internalLogInfo("Healthcheck(${source.id}): isAvailable=$isAvailabile")
         if (isAvailabile) {
-            updateSourceUiStateHealthCheck(source, SourceHealthUi.Available)
+            updateSourceUiStateHealthCheck(source, SourceHealthUiState.Available)
         } else {
-            updateSourceUiStateHealthCheck(source, SourceHealthUi.Unavailable)
+            updateSourceUiStateHealthCheck(source, SourceHealthUiState.Unavailable)
         }
     }
 
-    private fun updateSourceUiStateHealthCheck(source: Source, availability: SourceHealthUi) = updateState {
+    private fun updateSourceUiStateHealthCheck(source: Source, availability: SourceHealthUiState) = updateState {
+        val sourcePageStateContent = state.sourcePageState.content
+
         // Check current state is Content
         // We assume that health state updating request will be called
         // right after content will be displayed, so in this case exception will never be thrown
-        val content = (pluginContent as? HomeScreenPluginContent.Content)
+        val content = (sourcePageStateContent as? HomeScreenSourcePageContent.Content)
             ?: throw IllegalStateException(state.toString())
 
         // O(n^2) but we don't care. This list just cant contain more that 100-200 items
         val sources = content.sources.map { sourceUiState ->
             if (sourceUiState.id != source.id) return@map sourceUiState else {
-                return@map sourceUiState.copy(health = availability)
+                return@map sourceUiState.copy(healthState = availability)
             }
         }
 
-        copy(pluginContent = HomeScreenPluginContent.Content(sources = sources, refreshing = false))
-    }
-
-    override fun handleEvent(event: HomeScreenEvent) = when (event) {
-        is HomeScreenEvent.NavigationSource -> navigateSource(event)
-        HomeScreenEvent.RefreshPlugins -> refreshPlugins()
+        copy(
+            sourcePageState = sourcePageState.copy(
+                content = HomeScreenSourcePageContent.Content(sources = sources, refreshing = false)
+            )
+        )
     }
 
     private fun refreshPlugins() {
@@ -96,11 +168,7 @@ class HomeScreenViewModel @Inject constructor(
             val plugins = findAllPlugins()
             internalLogInfo("Found ${plugins.count()} plugins")
 
-            val sources = plugins.mapNotNull(pluginFactory::buildSource).onEach(::onHealthCheckSource)
-            val sourceUiList = sources.map(source2SourceUiStateMapper::map)
-            updateState {
-                copy(pluginContent = HomeScreenPluginContent.Content(sources = sourceUiList, refreshing = false))
-            }
+            _sourcesSharedFlow.emit(plugins.mapNotNull(pluginFactory::buildSource))
         }
     }
 

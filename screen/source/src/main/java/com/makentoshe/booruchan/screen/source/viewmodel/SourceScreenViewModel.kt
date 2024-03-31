@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.makentoshe.booruchan.feature.EmptySource
+import com.makentoshe.booruchan.feature.InitialSource
 import com.makentoshe.booruchan.feature.entity.TagType
 import com.makentoshe.booruchan.feature.interactor.AutocompleteInteractor
 import com.makentoshe.booruchan.feature.interactor.PluginInteractor
@@ -22,7 +22,6 @@ import com.makentoshe.booruchan.library.feature.EventDelegate
 import com.makentoshe.booruchan.library.feature.NavigationDelegate
 import com.makentoshe.booruchan.library.feature.StateDelegate
 import com.makentoshe.booruchan.library.feature.throwable.Throwable2ThrowableEntityMapper
-import com.makentoshe.booruchan.library.logging.internalLogError
 import com.makentoshe.booruchan.library.logging.internalLogInfo
 import com.makentoshe.booruchan.library.logging.internalLogWarn
 import com.makentoshe.booruchan.screen.source.mapper.Autocomplete2AutocompleteUiStateMapper
@@ -90,7 +89,7 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun initialize(event: SourceScreenEvent.Initialize) {
         // Skip logging here due frequent event invocation due recompositions
-        if (pluginInteractor.sourceFlow.value !is EmptySource) {
+        if (pluginInteractor.sourceFlow.value !is InitialSource) {
             return // skip initialization if source already defined
         }
 
@@ -111,7 +110,7 @@ class SourceScreenViewModel @Inject constructor(
 
     private fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
-        if (source is EmptySource) return@launch
+        if (source is InitialSource) return@launch
         // Show source title
         updateState { copy(sourceTitle = source.title) }
 
@@ -320,7 +319,7 @@ class SourceScreenViewModel @Inject constructor(
     private fun searchChangeTagRating(event: SourceScreenEvent.SearchTagChangeRating) {
         internalLogInfo("invoke event: $event")
         val source = pluginInteractor.sourceFlow.value
-        if (source is EmptySource) {
+        if (source is InitialSource) {
             return internalLogWarn("abandon event: source is empty")
         }
 
@@ -364,7 +363,7 @@ class SourceScreenViewModel @Inject constructor(
 
             // get source or show failure state
             val source = pluginInteractor.sourceFlow.value
-            if (source is EmptySource) {
+            if (source is InitialSource) {
                 internalLogWarn("abandon event: source is empty")
                 return@launch updateState { copy(contentState = pluginSourceNullContentState()) }
             }

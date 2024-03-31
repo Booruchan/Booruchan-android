@@ -1,6 +1,6 @@
 package com.makentoshe.booruchan.feature.interactor
 
-import com.makentoshe.booruchan.feature.EmptySource
+import com.makentoshe.booruchan.feature.InitialSource
 import com.makentoshe.booruchan.feature.entity.Autocomplete
 import com.makentoshe.booruchan.feature.exception.FetchAutocompleteEmptyException
 import com.makentoshe.booruchan.feature.exception.FetchAutocompleteFactoryException
@@ -42,7 +42,7 @@ class AutocompleteInteractor @Inject constructor(
 
     private suspend fun fetchAutocompleteJob(source: Source, autocompleteSearchValue: String) {
         // Check source is not empty
-        if (source is EmptySource) throw FetchAutocompleteSourceException()
+        if (source is InitialSource) throw FetchAutocompleteSourceException()
         // Check autocompletion is implemented
         val autocompleteSearchFactory = source.autocompleteSearchFactory ?: throw FetchAutocompleteFactoryException()
         // Check query is not empty

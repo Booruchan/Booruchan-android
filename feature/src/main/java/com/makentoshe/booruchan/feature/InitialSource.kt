@@ -7,12 +7,13 @@ import org.booruchan.extension.sdk.factory.HealthCheckFactory
 import org.booruchan.extension.sdk.settings.SourceSearchSettings
 import org.booruchan.extension.sdk.settings.SourceSettings
 
-object EmptySource : Source {
-    override val host: String get() = "host"
+/** Default initial source. This source indicates that source was not declared */
+object InitialSource : Source {
+    override val host: String get() = ""
 
-    override val id: String get() = "id"
+    override val id: String get() = "initial-source"
 
-    override val title: String get() = ""
+    override val title: String get() = "Initial source"
 
     override val settings: SourceSettings
         get() = SourceSettings(SourceSearchSettings())

@@ -3,7 +3,7 @@ package com.makentoshe.booruchan.screen.image.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import org.booruchan.extension.sdk.Source
-import com.makentoshe.booruchan.feature.EmptySource
+import com.makentoshe.booruchan.feature.InitialSource
 import com.makentoshe.booruchan.feature.interactor.PluginInteractor
 import com.makentoshe.booruchan.feature.usecase.GetPostByIdUseCase
 import com.makentoshe.booruchan.library.feature.CoroutineDelegate
@@ -63,7 +63,7 @@ class ImageScreenViewModel @Inject constructor(
 
     private suspend fun onSource(source: Source) = viewModelScope.launch(Dispatchers.IO) {
         // Ignore empty source which is applied on initial
-        if (source is EmptySource) return@launch
+        if (source is InitialSource) return@launch
         // Show source title
         updateState { copy(sourceTitle = source.title) }
         // Request post content

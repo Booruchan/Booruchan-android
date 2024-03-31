@@ -1,6 +1,7 @@
 package com.makentoshe.screen.boorulist
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -10,6 +11,7 @@ import com.makentoshe.booruchan.screen.Screen
 import com.makentoshe.library.uikit.extensions.collectLatestInComposable
 import com.makentoshe.screen.boorulist.ui.HomeScreenUi
 import com.makentoshe.screen.boorulist.viewmodel.HomeScreenDestination
+import com.makentoshe.screen.boorulist.viewmodel.HomeScreenEvent
 import com.makentoshe.screen.boorulist.viewmodel.HomeScreenViewModel
 
 @Composable
@@ -26,10 +28,12 @@ fun HomeScreen(navigator: HomeScreenNavigator) {
         }
     }
 
+    LaunchedEffect(key1 = Unit) {
+        viewModel.handleEvent(HomeScreenEvent.Initialize)
+    }
+
     HomeScreenUi(
         state = boorulistState,
         event = viewModel::handleEvent,
     )
-
-    screenLogInfo(Screen.Home, "HomeScreen composable")
 }
